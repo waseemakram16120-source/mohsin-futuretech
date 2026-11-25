@@ -92,6 +92,10 @@ export default function AccountPage() {
   useEffect(() => {
     if (loading) return;
     if (configured && !user) {
+      // Signed out (or session dropped): clear the previous user's live data
+      // so their addresses/orders never show on the guest view after logout.
+      setAddresses([]);
+      setHistory([]);
       router.replace("/login?next=/account");
       return;
     }
