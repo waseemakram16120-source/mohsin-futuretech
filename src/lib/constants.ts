@@ -9,6 +9,14 @@ export const STORE_NAME = "Mohsin FutureTech";
 export const STORE_TAGLINE = "Online Fashion & Clothing Store";
 export const CURRENCY = "PKR";
 
+/** Real store contact details, provided by the owner (2026-11-24). */
+export const STORE_OWNER = "Muhammad Waseem";
+export const STORE_EMAIL = "mwbusiness.com12@gmail.com";
+export const STORE_ADDRESS = "Korangi Industrial Area, Karachi, Pakistan";
+/** WhatsApp number as shown to customers (same number as the JazzCash / NayaPay accounts). */
+export const STORE_WHATSAPP_DISPLAY = "0308 2340478";
+export const STORE_WHATSAPP_LINK = "https://wa.me/923082340478";
+
 /** Format a number as Pakistani Rupees, e.g. 3499 -> "Rs 3,499". */
 export function formatPKR(amount: number): string {
   return `Rs ${new Intl.NumberFormat("en-PK", {

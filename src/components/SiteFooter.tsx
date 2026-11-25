@@ -3,8 +3,12 @@ import {
   DELIVERY_CHARGES_FLAT,
   FREE_DELIVERY_THRESHOLD,
   formatPKR,
+  STORE_ADDRESS,
+  STORE_EMAIL,
   STORE_NAME,
   STORE_TAGLINE,
+  STORE_WHATSAPP_DISPLAY,
+  STORE_WHATSAPP_LINK,
 } from "@/lib/constants";
 import type { StoreCategory } from "@/lib/data/categories";
 
@@ -24,6 +28,24 @@ export default function SiteFooter({
             A professional online fashion store — quality jeans, jackets,
             shirts, trousers and accessories, delivered across Pakistan.
           </p>
+          <ul className="mt-4 space-y-2 text-sm">
+            <li>
+              <a
+                href={STORE_WHATSAPP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white"
+              >
+                WhatsApp: {STORE_WHATSAPP_DISPLAY}
+              </a>
+            </li>
+            <li>
+              <a href={`mailto:${STORE_EMAIL}`} className="hover:text-white">
+                {STORE_EMAIL}
+              </a>
+            </li>
+            <li className="text-zinc-400">{STORE_ADDRESS}</li>
+          </ul>
         </div>
 
         <nav aria-label="Shop">
