@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { STORE_NAME, STORE_TAGLINE } from "@/lib/constants";
+import {
+  DELIVERY_CHARGES_FLAT,
+  FREE_DELIVERY_THRESHOLD,
+  formatPKR,
+  STORE_NAME,
+  STORE_TAGLINE,
+} from "@/lib/constants";
 import type { StoreCategory } from "@/lib/data/categories";
 
 /** Site-wide footer: about, shop links, customer care, payment methods. */
@@ -75,17 +81,23 @@ export default function SiteFooter({
           <p className="text-sm font-bold tracking-wide text-white uppercase">
             Payment Methods
           </p>
-          <ul className="mt-4 space-y-2 text-sm">
-            <li>Cash on Delivery (COD)</li>
-            <li>EasyPaisa</li>
-            <li>JazzCash</li>
-          </ul>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {["Cash on Delivery", "EasyPaisa", "JazzCash"].map((method) => (
+              <span
+                key={method}
+                className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-bold text-white"
+              >
+                {method}
+              </span>
+            ))}
+          </div>
           <p className="mt-4 text-sm leading-relaxed">
             EasyPaisa / JazzCash payments are verified manually by our team
             before your order is confirmed. No automatic payment gateway.
           </p>
           <p className="mt-4 text-sm">
-            Delivery across Pakistan · Flat Rs 200 · Free above Rs 5,000
+            Delivery across Pakistan · Flat {formatPKR(DELIVERY_CHARGES_FLAT)}{" "}
+            · Free above {formatPKR(FREE_DELIVERY_THRESHOLD)}
           </p>
         </div>
       </div>

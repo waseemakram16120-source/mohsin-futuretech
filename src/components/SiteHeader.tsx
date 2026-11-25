@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { STORE_NAME } from "@/lib/constants";
+import { formatPKR, FREE_DELIVERY_THRESHOLD, STORE_NAME } from "@/lib/constants";
 import type { StoreCategory } from "@/lib/data/categories";
 import { useCart, useWishlist } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
@@ -41,7 +41,7 @@ export default function SiteHeader({
     <header className="sticky top-0 z-40 bg-white shadow-sm">
       {/* Top strip */}
       <div className="bg-[#0f2440] px-4 py-1.5 text-center text-xs font-medium text-white sm:text-sm">
-        Winter Sale — Up to 30% Off · Use code <span className="font-bold text-amber-400">WELCOME10</span> for 10% off your first order
+        Free delivery on orders above {formatPKR(FREE_DELIVERY_THRESHOLD)} · Winter Sale — Up to 30% Off · Use code <span className="font-bold text-amber-400">WELCOME10</span> for 10% off
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6">

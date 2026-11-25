@@ -87,9 +87,30 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
               />
             );
           })}
-          <span className="ml-1 text-xs text-zinc-500">
-            Sizes: {productSizes(product).join(", ")}
-          </span>
+        </div>
+
+        {/* Size pills (Furor-style): availability at a glance, no need to open the product. */}
+        <div className="mt-2 flex flex-wrap gap-1" aria-label="Available sizes">
+          {productSizes(product).map((s) => {
+            const inStock = product.variants.some(
+              (v) => v.size === s && v.stock > 0,
+            );
+            return (
+              <span
+                key={s}
+                title={
+                  inStock ? `Size ${s} available` : `Size ${s} out of stock`
+                }
+                className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${
+                  inStock
+                    ? "border-zinc-300 text-zinc-700"
+                    : "border-zinc-200 text-zinc-400 line-through"
+                }`}
+              >
+                {s}
+              </span>
+            );
+          })}
         </div>
 
         <p

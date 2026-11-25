@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { formatPKR } from "@/lib/constants";
+import { formatPKR, DELIVERY_CHARGES_FLAT, FREE_DELIVERY_THRESHOLD } from "@/lib/constants";
 import { useCart } from "@/context/StoreContext";
 import WishlistButton from "@/components/WishlistButton";
 import {
@@ -338,17 +338,28 @@ export default function ProductDetail({ product }: { product: StoreProduct }) {
           </p>
         )}
 
-        {/* Payment / delivery info (from the proposal) */}
-        <div className="mt-6 rounded-xl bg-zinc-50 p-4 text-sm leading-relaxed text-zinc-600">
+        {/* Payment / delivery promise (from the proposal) — in the buy box,
+            like the reference stores, so shoppers see it before checkout. */}
+        <div className="mt-6 rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 text-sm leading-relaxed text-zinc-700">
           <p>
+            <span className="font-bold text-emerald-800">
+              ✓ Free delivery
+            </span>{" "}
+            on orders of {formatPKR(FREE_DELIVERY_THRESHOLD)} or more ·
+            otherwise {formatPKR(DELIVERY_CHARGES_FLAT)} flat, across Pakistan.
+          </p>
+          <p className="mt-1">
             <span className="font-semibold text-zinc-900">Payment:</span> Cash
             on Delivery, EasyPaisa or JazzCash. EasyPaisa / JazzCash payments
             are verified manually by our team.
           </p>
-          <p className="mt-1">
-            <span className="font-semibold text-zinc-900">Delivery:</span>{" "}
-            Across Pakistan · Flat Rs 200 · Free delivery on orders of Rs 5,000
-            or more.
+          <p className="mt-2">
+            <Link
+              href="/track"
+              className="font-semibold text-[#0f2440] hover:underline"
+            >
+              Track your order →
+            </Link>
           </p>
         </div>
       </div>
