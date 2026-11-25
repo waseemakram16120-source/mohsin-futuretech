@@ -22,6 +22,14 @@ export const metadata: Metadata = {
     "Mohsin FutureTech online fashion & clothing store. Browse collections, shop jeans, jackets, shirts and more — COD, EasyPaisa and JazzCash accepted.",
 };
 
+// The layout fetches categories from Supabase (via the cookie-based server
+// client) on every render, so the whole app must render dynamically.
+// Without this, `next build` tries to prerender pages statically and fails
+// with "uncached or runtime data during prerendering" as soon as the
+// Supabase env vars are set (in demo mode the local fallback has no
+// runtime data, so the build passed). See Vercel redeploy failure 2026-11-24.
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const categories = await getCategories();
   return (

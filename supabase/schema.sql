@@ -62,6 +62,22 @@ begin
 end;
 $$;
 
+-- profiles must be created BEFORE is_admin(): Postgres validates SQL-language
+-- functions at creation time and is_admin() references public.profiles.
+-- ----------------------------------------------------------------------------
+-- profiles — one row per auth user; role drives admin access (see is_admin())
+-- ----------------------------------------------------------------------------
+create table if not exists public.profiles (
+  id         uuid primary key references auth.users (id) on delete cascade,
+  email      text not null,
+  full_name  text not null default '',
+  phone      text,
+  role       public.user_role not null default 'customer',
+  avatar_url text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- True when the signed-in user has the admin role.
 -- Used by RLS policies in policies.sql and storage.sql.
 create or replace function public.is_admin()
@@ -152,19 +168,7 @@ create table if not exists public.product_variants (
   unique (product_id, size, color)
 );
 
--- ----------------------------------------------------------------------------
--- profiles — one row per auth user; role drives admin access (see is_admin())
--- ----------------------------------------------------------------------------
-create table if not exists public.profiles (
-  id         uuid primary key references auth.users (id) on delete cascade,
-  email      text not null,
-  full_name  text not null default '',
-  phone      text,
-  role       public.user_role not null default 'customer',
-  avatar_url text,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+-- profiles table is created earlier in this file, before is_admin() (see above).
 
 -- Auto-create a profile row whenever a user signs up (Supabase Auth).
 create or replace function public.handle_new_user()
