@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -20,6 +20,13 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // A reset link that expired (or was already used) lands back here.
+  useEffect(() => {
+    if (searchParams.get("error") === "reset-link-expired") {
+      setError("Your password-reset link expired or was already used. Request a new one below.");
+    }
+  }, [searchParams]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -86,6 +93,9 @@ function LoginForm() {
           {busy ? "Logging in…" : "Login"}
         </button>
       </form>
+      <p className="mt-4 text-center text-sm text-zinc-600">
+        <Link href="/forgot-password" className="font-semibold text-[#0f2440] hover:underline">Forgot password?</Link>
+      </p>
       <p className="mt-4 text-center text-sm text-zinc-600">
         Don&apos;t have an account?{" "}
         <Link href="/signup" className="font-semibold text-[#0f2440] hover:underline">Sign up</Link>
