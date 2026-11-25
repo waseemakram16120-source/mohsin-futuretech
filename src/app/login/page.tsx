@@ -14,7 +14,7 @@ import { useAuth } from "@/context/AuthContext";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { configured } = useAuth();
+  const { configured, user, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +27,14 @@ function LoginForm() {
       setError("Your password-reset link expired or was already used. Request a new one below.");
     }
   }, [searchParams]);
+
+  // Already signed in (e.g. bounced here by a stale guard) — go straight on
+  // instead of showing the login form again.
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace(searchParams.get("next") ?? "/account");
+    }
+  }, [loading, user, router, searchParams]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

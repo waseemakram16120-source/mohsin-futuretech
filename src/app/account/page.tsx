@@ -45,6 +45,8 @@ export default function AccountPage() {
   const [demoAddresses, setDemoAddresses] = useState<DemoAddress[]>([]);
   const [history, setHistory] = useState<HistoryOrder[]>([]);
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const [addressesLoading, setAddressesLoading] = useState(true);
+  const [addressMessage, setAddressMessage] = useState("");
   const [newAddress, setNewAddress] = useState({
     label: "Home",
     fullName: "",
@@ -57,29 +59,34 @@ export default function AccountPage() {
 
   const loadLiveData = useCallback(async () => {
     if (!user) return;
-    const supabase = createClient();
-    const [{ data: addr }, { data: orders }] = await Promise.all([
-      supabase.from("addresses").select("*").eq("user_id", user.id).order("is_default", { ascending: false }),
-      supabase.from("orders").select("order_number, total_amount, status, payment_method, created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
-    ]);
-    setAddresses((addr ?? []) as Address[]);
-    const live: HistoryOrder[] = ((orders ?? []) as Array<{ order_number: string; total_amount: number; status: string; payment_method: string; created_at: string }>).map((o) => ({
-      orderNumber: o.order_number,
-      total: o.total_amount,
-      status: o.status,
-      paymentMethod: o.payment_method,
-      createdAt: o.created_at,
-      demo: false,
-    }));
-    const demo: HistoryOrder[] = getDemoOrders().map((o: DemoOrder) => ({
-      orderNumber: o.orderNumber,
-      total: o.totalAmount,
-      status: o.status,
-      paymentMethod: o.paymentMethod,
-      createdAt: o.createdAt,
-      demo: true,
-    }));
-    setHistory([...live, ...demo].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+    setAddressesLoading(true);
+    try {
+      const supabase = createClient();
+      const [{ data: addr }, { data: orders }] = await Promise.all([
+        supabase.from("addresses").select("*").eq("user_id", user.id).order("is_default", { ascending: false }),
+        supabase.from("orders").select("order_number, total_amount, status, payment_method, created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
+      ]);
+      setAddresses((addr ?? []) as Address[]);
+      const live: HistoryOrder[] = ((orders ?? []) as Array<{ order_number: string; total_amount: number; status: string; payment_method: string; created_at: string }>).map((o) => ({
+        orderNumber: o.order_number,
+        total: o.total_amount,
+        status: o.status,
+        paymentMethod: o.payment_method,
+        createdAt: o.created_at,
+        demo: false,
+      }));
+      const demo: HistoryOrder[] = getDemoOrders().map((o: DemoOrder) => ({
+        orderNumber: o.orderNumber,
+        total: o.totalAmount,
+        status: o.status,
+        paymentMethod: o.paymentMethod,
+        createdAt: o.createdAt,
+        demo: true,
+      }));
+      setHistory([...live, ...demo].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+    } finally {
+      setAddressesLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -110,6 +117,7 @@ export default function AccountPage() {
       );
     }
     if (user) void loadLiveData();
+    else setAddressesLoading(false);
   }, [loading, configured, user, profile, router, loadLiveData]);
 
   async function onSaveProfile(e: React.FormEvent) {
@@ -154,11 +162,14 @@ export default function AccountPage() {
         postal_code: newAddress.postalCode.trim() || null,
         is_default: addresses.length === 0,
       });
-      if (!error) {
-        setNewAddress({ label: "Home", fullName: "", phone: "", addressLine1: "", city: "", province: "", postalCode: "" });
-        setShowAddressForm(false);
-        await loadLiveData();
+      if (error) {
+        setAddressMessage("Could not save the address. Please try again.");
+        return;
       }
+      setNewAddress({ label: "Home", fullName: "", phone: "", addressLine1: "", city: "", province: "", postalCode: "" });
+      setShowAddressForm(false);
+      setAddressMessage("Address saved.");
+      await loadLiveData();
       return;
     }
     const next: DemoAddress = {
@@ -273,7 +284,10 @@ export default function AccountPage() {
           <h2 className="text-lg font-bold text-zinc-900">Saved Addresses</h2>
           <button
             type="button"
-            onClick={() => setShowAddressForm((v) => !v)}
+            onClick={() => {
+              setShowAddressForm((v) => !v);
+              setAddressMessage("");
+            }}
             className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-[#0f2440] hover:border-[#0f2440]"
           >
             {showAddressForm ? "Cancel" : "+ Add Address"}
@@ -355,7 +369,13 @@ export default function AccountPage() {
               </div>
             </div>
           ))}
-          {addresses.length === 0 && demoAddresses.length === 0 && !showAddressForm && (
+          {addressMessage && (
+            <p className="text-sm font-semibold text-emerald-700">{addressMessage}</p>
+          )}
+          {configured && user && addressesLoading && (
+            <p className="text-sm text-zinc-500">Loading your addresses…</p>
+          )}
+          {addresses.length === 0 && demoAddresses.length === 0 && !showAddressForm && !addressesLoading && (
             <p className="text-sm text-zinc-500">No saved addresses yet. Add one to speed up checkout.</p>
           )}
         </div>
