@@ -78,7 +78,7 @@ export default async function Home() {
           {[
             { title: "Cash on Delivery", text: "Pay when it arrives" },
             { title: "EasyPaisa, JazzCash & NayaPay", text: "Manual verification" },
-            { title: "Delivery Across Pakistan", text: "Flat Rs 200 · Free above Rs 5,000" },
+            { title: "Delivery Across Pakistan", text: "Flat Rs 200 · Free on orders of Rs 5,000 or more" },
             { title: "Quality Checked", text: "Every item inspected" },
           ].map((item) => (
             <div key={item.title}>

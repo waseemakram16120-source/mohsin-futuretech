@@ -120,7 +120,7 @@ export default function SiteFooter({
           </p>
           <p className="mt-4 text-sm">
             Delivery across Pakistan · Flat {formatPKR(DELIVERY_CHARGES_FLAT)}{" "}
-            · Free above {formatPKR(FREE_DELIVERY_THRESHOLD)}
+            · Free on orders of {formatPKR(FREE_DELIVERY_THRESHOLD)} or more
           </p>
         </div>
       </div>
