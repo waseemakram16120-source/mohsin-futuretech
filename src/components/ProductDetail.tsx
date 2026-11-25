@@ -319,7 +319,7 @@ export default function ProductDetail({ product }: { product: StoreProduct }) {
           <WishlistButton
             productId={product.id}
             productName={product.name}
-            variantId={selectedVariant?.id ?? null}
+            variantSku={selectedVariant?.sku ?? null}
             label
           />
         </div>

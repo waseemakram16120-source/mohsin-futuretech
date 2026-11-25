@@ -45,16 +45,18 @@ export default function WishlistPage() {
       </p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => {
-          const savedVariantId = entries.find(
+          const savedVariantSku = entries.find(
             (e) => e.productId === product.id,
-          )?.variantId;
-          // Move the size/colour the customer saved; fall back to the
-          // first in-stock variant when none was chosen (e.g. saved
-          // from a product card) or the saved one sold out.
+          )?.variantSku;
+          // Move the size/colour the customer saved (matched by SKU — the
+          // one identifier shared by the live database and this local
+          // catalogue); fall back to the first in-stock variant when none
+          // was chosen (e.g. saved from a product card) or the saved one
+          // sold out.
           const variant =
-            (savedVariantId
+            (savedVariantSku
               ? product.variants.find(
-                  (v) => v.id === savedVariantId && v.stock > 0,
+                  (v) => v.sku === savedVariantSku && v.stock > 0,
                 )
               : undefined) ?? product.variants.find((v) => v.stock > 0);
           return (

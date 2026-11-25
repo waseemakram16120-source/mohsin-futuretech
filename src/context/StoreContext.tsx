@@ -75,7 +75,12 @@ export function useCart(): CartContextValue {
 /** A saved product plus the size/colour the customer had chosen, if any. */
 export interface WishlistEntry {
   productId: string;
-  variantId: string | null;
+  /**
+   * The saved variant's SKU (e.g. MF-JN-001-BLU-32) — NOT the variant id.
+   * Live Supabase variants carry database UUIDs while the local catalogue
+   * builds ids as `slug-sku`, so only the SKU is the same in both places.
+   */
+  variantSku: string | null;
 }
 
 interface WishlistContextValue {
@@ -85,11 +90,11 @@ interface WishlistContextValue {
   productIds: string[];
   isWishlisted: (productId: string) => boolean;
   /**
-   * Saves the product with the chosen variant (or updates the saved
+   * Saves the product with the chosen variant's SKU (or updates the saved
    * variant when it is already saved and a different one is chosen);
    * tapping again with the same variant removes it.
    */
-  toggleWishlist: (productId: string, variantId?: string | null) => void;
+  toggleWishlist: (productId: string, variantSku?: string | null) => void;
 }
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
@@ -120,17 +125,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setCouponCode(storedCoupon);
     }
     // Wishlist v2 (entries with variant). Migrate v1 (plain product ids).
-    const v2 = load<WishlistEntry[] | null>(WISHLIST_STORAGE_KEY_V2, null);
+    // Entries written by the short-lived id-based build carry a database
+    // UUID as variantId — those never match the local catalogue, so only
+    // a stored SKU is kept; anything else falls back to no variant.
+    const v2 = load<
+      Array<{
+        productId?: unknown;
+        variantSku?: unknown;
+      }> | null
+    >(WISHLIST_STORAGE_KEY_V2, null);
     if (Array.isArray(v2)) {
       setWishlistEntries(
-        v2.filter(
-          (e) => e && typeof e.productId === "string",
-        ),
+        v2
+          .filter((e) => e && typeof e.productId === "string")
+          .map((e) => ({
+            productId: e.productId as string,
+            variantSku:
+              typeof e.variantSku === "string" ? e.variantSku : null,
+          })),
       );
     } else {
       const v1 = load<string[]>(WISHLIST_STORAGE_KEY, []);
       setWishlistEntries(
-        v1.map((productId) => ({ productId, variantId: null })),
+        v1.map((productId) => ({ productId, variantSku: null })),
       );
     }
     setHydrated(true);
@@ -244,17 +261,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const toggleWishlist = useCallback(
-    (productId: string, variantId: string | null = null) => {
+    (productId: string, variantSku: string | null = null) => {
       setWishlistEntries((prev) => {
         const existing = prev.find((e) => e.productId === productId);
         let next: WishlistEntry[];
         if (!existing) {
-          next = [...prev, { productId, variantId }];
-        } else if (variantId && existing.variantId !== variantId) {
+          next = [...prev, { productId, variantSku }];
+        } else if (variantSku && existing.variantSku !== variantSku) {
           // Already saved, but the customer picked another size/colour —
           // update the saved variant instead of removing it.
           next = prev.map((e) =>
-            e.productId === productId ? { ...e, variantId } : e,
+            e.productId === productId ? { ...e, variantSku } : e,
           );
         } else {
           next = prev.filter((e) => e.productId !== productId);
