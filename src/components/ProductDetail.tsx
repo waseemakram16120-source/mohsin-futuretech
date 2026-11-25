@@ -316,7 +316,12 @@ export default function ProductDetail({ product }: { product: StoreProduct }) {
             {outOfStock ? "Out of Stock" : "Add to Cart"}
           </button>
 
-          <WishlistButton productId={product.id} productName={product.name} label />
+          <WishlistButton
+            productId={product.id}
+            productName={product.name}
+            variantId={selectedVariant?.id ?? null}
+            label
+          />
         </div>
         {cartNote && (
           <p

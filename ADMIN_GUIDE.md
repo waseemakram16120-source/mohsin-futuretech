@@ -1,19 +1,25 @@
 # Mohsin FutureTech — Admin Guide
 
 A short guide for the store owner. No technical background needed for the
-day-to-day jobs. The parts marked **Setup (one time)** are done once, when
-the store goes live.
+day-to-day jobs.
 
-## 1. Demo mode vs live mode
+## 1. Live mode (since 2026-11-25)
 
-Until a Supabase project is connected, the website runs in **demo mode**:
-orders, payments and admin changes are stored only in that browser and are
-clearly labelled "Demo". Nothing is lost — the same pages work with real
-data as soon as Supabase is connected (see §2).
+The store is **live on real Supabase** — no longer demo mode:
 
-## 2. Setup (one time) — connect the database
+- **Live site:** https://mohsin-futuretech.vercel.app
+- **Supabase project:** mohsin-futuretech, Singapore (ap-southeast-1),
+  Healthy — https://nkabzgbzxpnuvoxqungc.supabase.co
+- **Database:** 10 tables, 7 categories, 12 sample products, 41 variants,
+  WELCOME10 coupon, buckets `product-images` (public) and
+  `payment-receipts` (private)
+- Orders, payments and admin changes now save to the real database.
+  (If the Supabase keys were ever removed, the site falls back to demo
+  mode — orders saved only in that browser, clearly labelled "Demo".)
 
-1. Create a project at https://supabase.com (Singapore is closest to
+## 2. Setup (one time) — ✅ done 2026-11-25
+
+~~1. Create a project at https://supabase.com (Singapore is closest to
    Pakistan). Note the **Project URL** and keys.
 2. In the Supabase Dashboard, open **SQL Editor → New query** and run
    these files from the project folder, **in this order**, each as its own
@@ -32,7 +38,13 @@ data as soon as Supabase is connected (see §2).
 5. On Vercel, add the same three values under Project → Settings →
    Environment Variables, then redeploy.
 6. Set the payment accounts (see §7) and the delivery rules if they
-   change.
+   change.~~
+
+Done: project created, all 4 SQL files run in order, keys added to
+Vercel and redeployed (build fix: Next.js cacheComponents turned off,
+layout forced live rendering). Verified live 2026-11-25: login page no
+longer shows "not connected", product page shows real stock.
+Still to do: §7 payment accounts and §3 first admin.
 
 ## 3. Make the first admin
 
@@ -153,7 +165,7 @@ the environment variables above.
 
 ## 8. Going-live checklist
 
-- [ ] Supabase project created, SQL run, seed data checked
+- [x] Supabase project created, SQL run, seed data checked (done 2026-11-25, live-verified)
 - [ ] Real products, prices and photos added (replace the 12 samples)
 - [ ] Real EasyPaisa / JazzCash numbers set
 - [ ] WhatsApp number given to the developer (footer link)

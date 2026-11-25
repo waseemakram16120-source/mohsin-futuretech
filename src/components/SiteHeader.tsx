@@ -92,7 +92,7 @@ export default function SiteHeader({
             <Link
               href="/wishlist"
               title="Wishlist"
-              aria-label={`Wishlist, ${productIds.length} saved items`}
+              aria-label={`Wishlist, ${productIds.length} saved item${productIds.length === 1 ? "" : "s"}`}
               className="relative rounded-full px-2.5 py-2 text-xl text-[#0f2440] hover:bg-zinc-100"
             >
               ♡
@@ -105,7 +105,7 @@ export default function SiteHeader({
             <Link
               href="/cart"
               title="Shopping cart"
-              aria-label={`Shopping cart, ${totals.itemCount} items`}
+              aria-label={`Shopping cart, ${totals.itemCount} item${totals.itemCount === 1 ? "" : "s"}`}
               className="relative rounded-full px-2.5 py-2 text-xl text-[#0f2440] hover:bg-zinc-100"
             >
               🛒

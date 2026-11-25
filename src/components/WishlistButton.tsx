@@ -9,10 +9,13 @@ import { useWishlist } from "@/context/StoreContext";
 export default function WishlistButton({
   productId,
   productName,
+  variantId = null,
   label = false,
 }: {
   productId: string;
   productName: string;
+  /** Size/colour the customer has chosen on the product page, if any. */
+  variantId?: string | null;
   label?: boolean;
 }) {
   const { isWishlisted, toggleWishlist } = useWishlist();
@@ -20,7 +23,7 @@ export default function WishlistButton({
   return (
     <button
       type="button"
-      onClick={() => toggleWishlist(productId)}
+      onClick={() => toggleWishlist(productId, variantId)}
       aria-pressed={active}
       aria-label={active ? `Remove ${productName} from wishlist` : `Save ${productName} to wishlist`}
       title={active ? "Saved in your wishlist" : "Save to wishlist"}

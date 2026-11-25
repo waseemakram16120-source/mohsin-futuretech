@@ -22,7 +22,9 @@ import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/data/store-client";
 import {
   CART_STORAGE_KEY,
+  COUPON_STORAGE_KEY,
   WISHLIST_STORAGE_KEY,
+  WISHLIST_STORAGE_KEY_V2,
   computeTotals,
   type CartItem,
   type CartTotals,
@@ -70,10 +72,24 @@ export function useCart(): CartContextValue {
 
 /* -------------------------------- wishlist -------------------------------- */
 
+/** A saved product plus the size/colour the customer had chosen, if any. */
+export interface WishlistEntry {
+  productId: string;
+  variantId: string | null;
+}
+
 interface WishlistContextValue {
+  /** Saved products, in order. */
+  entries: WishlistEntry[];
+  /** Product ids only — used by the header badge and the Supabase sync. */
   productIds: string[];
   isWishlisted: (productId: string) => boolean;
-  toggleWishlist: (productId: string) => void;
+  /**
+   * Saves the product with the chosen variant (or updates the saved
+   * variant when it is already saved and a different one is chosen);
+   * tapping again with the same variant removes it.
+   */
+  toggleWishlist: (productId: string, variantId?: string | null) => void;
 }
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
@@ -87,13 +103,36 @@ export function useWishlist(): WishlistContextValue {
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [couponCode, setCouponCode] = useState<string | null>(null);
-  const [productIds, setProductIds] = useState<string[]>([]);
+  const [wishlistEntries, setWishlistEntries] = useState<WishlistEntry[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   // Load persisted state once, on the client.
   useEffect(() => {
-    setItems(load<CartItem[]>(CART_STORAGE_KEY, []));
-    setProductIds(load<string[]>(WISHLIST_STORAGE_KEY, []));
+    const loadedItems = load<CartItem[]>(CART_STORAGE_KEY, []);
+    setItems(loadedItems);
+    // Keep a saved coupon only while it still applies to this basket
+    // (e.g. WELCOME10 needs a subtotal of at least Rs 2,000).
+    const storedCoupon = load<string | null>(COUPON_STORAGE_KEY, null);
+    if (
+      storedCoupon &&
+      computeTotals(loadedItems, storedCoupon).coupon?.valid
+    ) {
+      setCouponCode(storedCoupon);
+    }
+    // Wishlist v2 (entries with variant). Migrate v1 (plain product ids).
+    const v2 = load<WishlistEntry[] | null>(WISHLIST_STORAGE_KEY_V2, null);
+    if (Array.isArray(v2)) {
+      setWishlistEntries(
+        v2.filter(
+          (e) => e && typeof e.productId === "string",
+        ),
+      );
+    } else {
+      const v1 = load<string[]>(WISHLIST_STORAGE_KEY, []);
+      setWishlistEntries(
+        v1.map((productId) => ({ productId, variantId: null })),
+      );
+    }
     setHydrated(true);
   }, []);
 
@@ -102,8 +141,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [items, hydrated]);
 
   useEffect(() => {
-    if (hydrated) save(WISHLIST_STORAGE_KEY, productIds);
-  }, [productIds, hydrated]);
+    if (hydrated) save(COUPON_STORAGE_KEY, couponCode);
+  }, [couponCode, hydrated]);
+
+  useEffect(() => {
+    if (hydrated) save(WISHLIST_STORAGE_KEY_V2, wishlistEntries);
+  }, [wishlistEntries, hydrated]);
 
   const totals = useMemo(
     () => computeTotals(items, couponCode),
@@ -201,17 +244,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const toggleWishlist = useCallback(
-    (productId: string) => {
-      setProductIds((prev) => {
-        const next = prev.includes(productId)
-          ? prev.filter((id) => id !== productId)
-          : [...prev, productId];
-        // Fire-and-forget sync when signed in.
+    (productId: string, variantId: string | null = null) => {
+      setWishlistEntries((prev) => {
+        const existing = prev.find((e) => e.productId === productId);
+        let next: WishlistEntry[];
+        if (!existing) {
+          next = [...prev, { productId, variantId }];
+        } else if (variantId && existing.variantId !== variantId) {
+          // Already saved, but the customer picked another size/colour —
+          // update the saved variant instead of removing it.
+          next = prev.map((e) =>
+            e.productId === productId ? { ...e, variantId } : e,
+          );
+        } else {
+          next = prev.filter((e) => e.productId !== productId);
+        }
+        // Fire-and-forget sync when signed in (product ids only — the
+        // wishlist table has no variant column).
         if (isSupabaseConfigured()) {
           createClient()
             .auth.getUser()
             .then(({ data }) => {
-              if (data.user) void syncWishlistToSupabase(next, data.user.id);
+              if (data.user) {
+                void syncWishlistToSupabase(
+                  next.map((e) => e.productId),
+                  data.user.id,
+                );
+              }
             })
             .catch(() => undefined);
         }
@@ -246,13 +305,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     ],
   );
 
+  const productIds = useMemo(
+    () => wishlistEntries.map((e) => e.productId),
+    [wishlistEntries],
+  );
+
   const wishlistValue = useMemo<WishlistContextValue>(
     () => ({
+      entries: wishlistEntries,
       productIds,
       isWishlisted: (productId: string) => productIds.includes(productId),
       toggleWishlist,
     }),
-    [productIds, toggleWishlist],
+    [wishlistEntries, productIds, toggleWishlist],
   );
 
   return (

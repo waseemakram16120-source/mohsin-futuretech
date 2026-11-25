@@ -7,14 +7,21 @@ orders with COD / EasyPaisa / JazzCash, and track order progress. The business
 manages products, inventory, orders, customers, payment verification and
 reports through a secure admin dashboard.
 
-**Current status: Step 6 — Testing & deployment complete.** The
+**Current status: LIVE on real Supabase (since 2026-11-25).** The
 storefront (Step 2) plus cart, wishlist, checkout, customer login / profile
 / saved addresses, order history and order tracking (Step 3) are built,
 EasyPaisa / JazzCash manual payment verification (Step 4) is built, the
 admin dashboard (Step 5) is built, and Step 6 testing, bug fixing and
-deployment are done. No live Supabase project exists yet, so orders are
-created in **demo mode** (saved in the browser) until the project is
-connected — see "Demo mode" below. Admin guidance is in
+deployment are done. Supabase project `mohsin-futuretech` (Singapore,
+Healthy, https://nkabzgbzxpnuvoxqungc.supabase.co) is connected — 10
+tables, 7 categories, 12 sample products, WELCOME10 coupon — and the live
+site at https://mohsin-futuretech.vercel.app saves real orders to the
+database (verified: login page no longer shows "not connected", product
+page shows real stock). GitHub:
+`waseemakram16120-source/mohsin-futuretech`, latest commit `6ae1f0d4`.
+Still needed from the client: real products/photos/prices, EasyPaisa /
+JazzCash account numbers, WhatsApp number, and the first admin account
+(see §3 of [`ADMIN_GUIDE.md`](ADMIN_GUIDE.md)). Admin guidance is in
 [`ADMIN_GUIDE.md`](ADMIN_GUIDE.md).
 
 ## Tech stack
@@ -234,11 +241,11 @@ npm start        # serve the production build
 - Vercel (target): project `mohsin-futuretech` — live URL and public
   check are recorded in the Step 6 report once deployed; deployment
   protection OFF so the client can view it publicly.
-- Environment variables on Vercel: leave the Supabase and payment
-  variables blank until the real project / accounts exist (the site
-  runs in demo mode meanwhile and shows placeholders, never fake
-  numbers). Add them under Project → Settings → Environment Variables
-  and redeploy when ready.
+- Environment variables on Vercel: the three Supabase values are set
+  (added 2026-11-25, live-verified). The payment variables are still
+  blank until the real accounts exist (the site shows placeholders,
+  never fake numbers). Add them under Project → Settings →
+  Environment Variables and redeploy when ready.
 
 ## Step 2 — what is done (storefront)
 

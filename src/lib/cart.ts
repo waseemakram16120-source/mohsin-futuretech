@@ -46,6 +46,9 @@ export interface CartTotals {
 
 export const CART_STORAGE_KEY = "mf-cart-v1";
 export const WISHLIST_STORAGE_KEY = "mf-wishlist-v1";
+/** Wishlist entries with the chosen variant (v2); v1 ids migrate on load. */
+export const WISHLIST_STORAGE_KEY_V2 = "mf-wishlist-v2";
+export const COUPON_STORAGE_KEY = "mf-coupon-v1";
 
 /**
  * WELCOME10 — the seeded coupon (see supabase/seed.sql): 10% off, minimum

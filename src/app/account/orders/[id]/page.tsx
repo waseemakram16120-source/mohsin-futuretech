@@ -8,7 +8,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { formatPKR, PAYMENT_METHODS } from "@/lib/constants";
 import { findDemoOrder, type DemoOrder } from "@/lib/demo-orders";
 import type { OrderWithDetails } from "@/lib/types";
@@ -17,7 +17,11 @@ import PaymentStatusCard from "@/components/PaymentStatusCard";
 
 function OrderDetailContent() {
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const orderNumber = decodeURIComponent(params.id ?? "");
+  // Guests arrive here from /track with the delivery phone they already
+  // verified — the API needs it to release a guest order.
+  const phone = searchParams.get("phone") ?? "";
   const [demoOrder, setDemoOrder] = useState<DemoOrder | null>(null);
   const [liveOrder, setLiveOrder] = useState<OrderWithDetails | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -31,7 +35,10 @@ function OrderDetailContent() {
       setLoaded(true);
       return;
     }
-    fetch(`/api/orders?number=${encodeURIComponent(orderNumber)}`)
+    const query = phone
+      ? `?number=${encodeURIComponent(orderNumber)}&phone=${encodeURIComponent(phone)}`
+      : `?number=${encodeURIComponent(orderNumber)}`;
+    fetch(`/api/orders${query}`)
       .then((r) => r.json())
       .then((result) => {
         if (result?.found) setLiveOrder(result.order as OrderWithDetails);
@@ -39,7 +46,7 @@ function OrderDetailContent() {
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoaded(true));
-  }, [orderNumber]);
+  }, [orderNumber, phone]);
 
   if (!loaded) {
     return (
@@ -56,8 +63,11 @@ function OrderDetailContent() {
         <p className="mt-2 text-zinc-600">
           We could not find order {orderNumber} on this account or device.
         </p>
-        <Link href="/account" className="mt-6 inline-block rounded-full bg-[#0f2440] px-6 py-3 text-sm font-bold text-white">
-          Back to My Account
+        <Link
+          href={phone ? `/track?order=${encodeURIComponent(orderNumber)}` : "/account"}
+          className="mt-6 inline-block rounded-full bg-[#0f2440] px-6 py-3 text-sm font-bold text-white"
+        >
+          {phone ? "Back to Track Order" : "Back to My Account"}
         </Link>
       </main>
     );

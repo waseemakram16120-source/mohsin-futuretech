@@ -2,7 +2,8 @@
  * Wishlist (Step 3).
  *
  * Saved items (localStorage, synced to Supabase when signed in). Each
- * item can be moved to the cart (first in-stock variant) or removed.
+ * item can be moved to the cart in the size/colour the customer saved
+ * (or the first in-stock variant when none was chosen), or removed.
  */
 "use client";
 
@@ -12,9 +13,11 @@ import { LOCAL_PRODUCTS } from "@/lib/data/products";
 import { formatPKR } from "@/lib/constants";
 
 export default function WishlistPage() {
-  const { productIds, toggleWishlist } = useWishlist();
+  const { entries, toggleWishlist } = useWishlist();
   const { addItem } = useCart();
-  const products = LOCAL_PRODUCTS.filter((p) => productIds.includes(p.id));
+  const products = LOCAL_PRODUCTS.filter((p) =>
+    entries.some((e) => e.productId === p.id),
+  );
 
   if (products.length === 0) {
     return (
@@ -42,7 +45,18 @@ export default function WishlistPage() {
       </p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => {
-          const variant = product.variants.find((v) => v.stock > 0);
+          const savedVariantId = entries.find(
+            (e) => e.productId === product.id,
+          )?.variantId;
+          // Move the size/colour the customer saved; fall back to the
+          // first in-stock variant when none was chosen (e.g. saved
+          // from a product card) or the saved one sold out.
+          const variant =
+            (savedVariantId
+              ? product.variants.find(
+                  (v) => v.id === savedVariantId && v.stock > 0,
+                )
+              : undefined) ?? product.variants.find((v) => v.stock > 0);
           return (
             <article
               key={product.id}

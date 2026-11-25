@@ -127,7 +127,7 @@ function TrackForm() {
         </button>
       </form>
 
-      {searched && !order && !error && (
+      {searched && !busy && !order && !error && (
         <p className="mt-6 text-sm text-zinc-500">No order found.</p>
       )}
 
@@ -146,7 +146,7 @@ function TrackForm() {
               </p>
             </div>
             <Link
-              href={`/account/orders/${demoOrder?.orderNumber ?? liveOrder!.order_number}`}
+              href={`/account/orders/${demoOrder?.orderNumber ?? liveOrder!.order_number}?phone=${encodeURIComponent(phone.trim())}`}
               className="text-sm font-semibold text-[#0f2440] hover:underline"
             >
               View full details →
