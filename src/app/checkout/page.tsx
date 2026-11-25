@@ -286,9 +286,21 @@ export default function CheckoutPage() {
       }
 
       clearCart();
-      router.push(
-        `/order-success?order=${encodeURIComponent(result.orderNumber)}&mode=${result.mode ?? "live"}`,
-      );
+      // Wallet payments (EasyPaisa / JazzCash / NayaPay) go straight to the
+      // payment page so the customer submits the Transaction ID + screenshot
+      // right away instead of hunting for the link. COD goes to the
+      // order-success page as before.
+      if (
+        paymentMethod === "easypaisa" ||
+        paymentMethod === "jazzcash" ||
+        paymentMethod === "nayapay"
+      ) {
+        router.push(`/pay/${encodeURIComponent(result.orderNumber)}`);
+      } else {
+        router.push(
+          `/order-success?order=${encodeURIComponent(result.orderNumber)}&mode=${result.mode ?? "live"}`,
+        );
+      }
     } catch {
       setSubmitError("Could not place your order. Please check your connection and try again.");
     } finally {
@@ -436,19 +448,21 @@ export default function CheckoutPage() {
                 <input id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} className={inputClass} placeholder="Any delivery instructions?" />
               </div>
             </div>
-            <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-zinc-700">
-              <input
-                type="checkbox"
-                checked={saveAddress}
-                onChange={(e) => setSaveAddress(e.target.checked)}
-                className="accent-[#0f2440]"
-              />
-              Save this address to my account for next time
-            </label>
+            {user && (
+              <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-zinc-700">
+                <input
+                  type="checkbox"
+                  checked={saveAddress}
+                  onChange={(e) => setSaveAddress(e.target.checked)}
+                  className="accent-[#0f2440]"
+                />
+                Save this address to my account for next time
+              </label>
+            )}
             {!user && (
               <p className="mt-2 text-xs text-zinc-500">
                 You are checking out as a guest.{" "}
-                <Link href="/login" className="font-semibold text-[#0f2440] hover:underline">
+                <Link href="/login?next=/checkout" className="font-semibold text-[#0f2440] hover:underline">
                   Log in
                 </Link>{" "}
                 to save addresses and see your order history in your account.
@@ -574,6 +588,12 @@ export default function CheckoutPage() {
           >
             {submitting ? "Placing your order…" : `Place Order · ${formatPKR(totals.total)}`}
           </button>
+          {paymentMethod !== "cod" && (
+            <p className="mt-2 text-center text-xs text-zinc-500">
+              After placing your order, you&apos;ll go straight to the payment
+              page to send the payment and submit your Transaction ID.
+            </p>
+          )}
           <p className="mt-2 text-center text-xs text-zinc-500">
             By placing this order you agree to pay {method.shortLabel === "COD" ? "in cash on delivery" : "as per the payment instructions"}.
           </p>

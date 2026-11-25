@@ -106,8 +106,33 @@ function LoginForm() {
       </p>
       <p className="mt-4 text-center text-sm text-zinc-600">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-semibold text-[#0f2440] hover:underline">Sign up</Link>
+        <Link
+          href={
+            searchParams.get("next")
+              ? `/signup?next=${encodeURIComponent(searchParams.get("next") as string)}`
+              : "/signup"
+          }
+          className="font-semibold text-[#0f2440] hover:underline"
+        >
+          Sign up
+        </Link>
       </p>
+      {/* Daraz-style skip: keep shopping / checking out as a guest instead. */}
+      <div className="mt-6 flex items-center gap-3 text-xs text-zinc-400">
+        <span className="h-px flex-1 bg-zinc-200" />
+        <span>or</span>
+        <span className="h-px flex-1 bg-zinc-200" />
+      </div>
+      <Link
+        href={
+          searchParams.get("next") && searchParams.get("next") !== "/account"
+            ? (searchParams.get("next") as string)
+            : "/shop"
+        }
+        className="mt-4 block w-full rounded-full border border-zinc-300 px-6 py-3 text-center text-sm font-bold text-zinc-700 hover:border-[#0f2440] hover:text-[#0f2440]"
+      >
+        Skip for now — Continue as Guest
+      </Link>
     </main>
   );
 }

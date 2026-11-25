@@ -5,14 +5,21 @@
  */
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // Where to return after sign-up + login (e.g. /checkout when signing up
+  // from checkout) — carried through to the login page.
+  const next = searchParams.get("next");
+  const loginHref = next
+    ? `/login?next=${encodeURIComponent(next)}`
+    : "/login";
   const { configured } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -75,7 +82,7 @@ export default function SignupPage() {
         </p>
         <button
           type="button"
-          onClick={() => router.push("/login")}
+          onClick={() => router.push(loginHref)}
           className="mt-6 rounded-full bg-[#0f2440] px-8 py-3 text-sm font-bold text-white hover:bg-[#1a3a5c]"
         >
           Go to Login
@@ -117,8 +124,16 @@ export default function SignupPage() {
       </form>
       <p className="mt-4 text-center text-sm text-zinc-600">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-[#0f2440] hover:underline">Login</Link>
+        <Link href={loginHref} className="font-semibold text-[#0f2440] hover:underline">Login</Link>
       </p>
     </main>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<main className="mx-auto max-w-md px-4 py-16"><p className="text-zinc-600">Loading…</p></main>}>
+      <SignupForm />
+    </Suspense>
   );
 }

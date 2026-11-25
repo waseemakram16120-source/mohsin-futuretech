@@ -301,7 +301,8 @@ function PayContent() {
       {justSubmitted && (
         <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">
           ✓ Payment evidence submitted. It is now Pending Verification — the
-          store will review it and approve it once verified.
+          store will review it and approve it once verified. Your order will
+          be confirmed after approval.
         </p>
       )}
 
