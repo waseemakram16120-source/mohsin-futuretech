@@ -54,7 +54,7 @@ export const PAYMENT_METHODS: PaymentMethodInfo[] = [
     description:
       "Pay via EasyPaisa, then submit your Transaction ID and payment screenshot.",
     instructions:
-      "Send payment to the EasyPaisa account shown here, then submit your Transaction ID and screenshot. Account details to be added by the store owner.",
+      "Send payment to the EasyPaisa account shown above, then submit your Transaction ID and screenshot.",
   },
   {
     value: "jazzcash",
@@ -63,7 +63,7 @@ export const PAYMENT_METHODS: PaymentMethodInfo[] = [
     description:
       "Pay via JazzCash, then submit your Transaction ID and payment screenshot.",
     instructions:
-      "Send payment to the JazzCash account shown here, then submit your Transaction ID and screenshot. Account details to be added by the store owner.",
+      "Send payment to the JazzCash account shown above, then submit your Transaction ID and screenshot.",
   },
   {
     value: "nayapay",
@@ -72,7 +72,7 @@ export const PAYMENT_METHODS: PaymentMethodInfo[] = [
     description:
       "Pay via NayaPay, then submit your Transaction ID and payment screenshot.",
     instructions:
-      "Send payment to the NayaPay account shown here, then submit your Transaction ID and screenshot. Account details to be added by the store owner.",
+      "Send payment to the NayaPay account shown above, then submit your Transaction ID and screenshot.",
   },
 ];
 
