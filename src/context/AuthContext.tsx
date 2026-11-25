@@ -44,6 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  /** Id of the user whose profile has been loaded (null = none yet). */
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async (userId: string) => {
     try {
@@ -56,6 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile((data as unknown as Profile | null) ?? null);
     } catch {
       setProfile(null);
+    } finally {
+      setProfileUserId(userId);
     }
   }, []);
 
@@ -70,23 +74,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     const supabase = createClient();
+    let cancelled = false;
     supabase.auth
       .getSession()
-      .then(({ data }) => {
-        setUser(data.session?.user ?? null);
-        if (data.session?.user) void fetchProfile(data.session.user.id);
+      .then(async ({ data }) => {
+        const sessionUser = data.session?.user ?? null;
+        if (cancelled) return;
+        setUser(sessionUser);
+        // Wait for the profile before clearing `loading`: the admin
+        // guard shows "Access denied" while user is set but profile is
+        // still null, so clearing loading first flashes a denial on
+        // every fresh page load.
+        if (sessionUser) await fetchProfile(sessionUser.id);
+        if (!cancelled) setLoading(false);
       })
-      .catch(() => undefined)
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) void fetchProfile(session.user.id);
-      else setProfile(null);
+      else {
+        setProfile(null);
+        setProfileUserId(null);
+      }
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [configured, fetchProfile]);
 
   const signOut = useCallback(async () => {
@@ -94,11 +113,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await createClient().auth.signOut();
     setUser(null);
     setProfile(null);
+    setProfileUserId(null);
   }, [configured]);
 
+  // Loading covers the profile too: while a signed-in user has no
+  // profile loaded yet, guards must wait instead of deciding the user
+  // is not an admin. Signed-out users have nothing to load.
+  const loadingWithProfile = loading || (user !== null && profileUserId !== user.id);
+
   const value = useMemo<AuthContextValue>(
-    () => ({ configured, user, profile, loading, signOut, refreshProfile }),
-    [configured, user, profile, loading, signOut, refreshProfile],
+    () => ({ configured, user, profile, loading: loadingWithProfile, signOut, refreshProfile }),
+    [configured, user, profile, loadingWithProfile, signOut, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

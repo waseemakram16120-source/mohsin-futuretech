@@ -71,6 +71,8 @@ export default function AdminOrderDetailPage({
         const updated = adminUpdateDemoOrderStatus(order.orderNumber, next);
         if (updated) setOrder(updated);
       } else {
+        // Show the new status at once; the refetch below confirms it.
+        setOrder({ ...order, status: next });
         load();
       }
       setMessage(`Order status updated to ${next}.`);
