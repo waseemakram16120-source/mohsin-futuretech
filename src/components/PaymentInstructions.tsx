@@ -1,10 +1,10 @@
 /**
  * Payment instructions (Step 4 — manual verification only).
  *
- * Shows the store's EasyPaisa / JazzCash account, the exact amount due,
- * and the step-by-step instructions from the proposal (§4). When the
- * store owner has not configured an account yet, a clear placeholder is
- * shown — never a fake number.
+ * Shows the store's wallet account (EasyPaisa / JazzCash / NayaPay), the
+ * exact amount due, and the step-by-step instructions from the proposal
+ * (§4). When the store owner has not configured an account yet, a clear
+ * placeholder is shown — never a fake number.
  */
 "use client";
 

@@ -5,7 +5,7 @@
 
 export type UserRole = "customer" | "admin";
 
-export type PaymentMethod = "cod" | "easypaisa" | "jazzcash";
+export type PaymentMethod = "cod" | "easypaisa" | "jazzcash" | "nayapay";
 
 /** DB values; display labels live in src/lib/constants.ts. */
 export type PaymentStatus =

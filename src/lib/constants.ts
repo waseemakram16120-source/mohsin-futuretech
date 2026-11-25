@@ -57,6 +57,15 @@ export const PAYMENT_METHODS: PaymentMethodInfo[] = [
     instructions:
       "Send payment to the JazzCash account shown here, then submit your Transaction ID and screenshot. Account details to be added by the store owner.",
   },
+  {
+    value: "nayapay",
+    label: "NayaPay",
+    shortLabel: "NayaPay",
+    description:
+      "Pay via NayaPay, then submit your Transaction ID and payment screenshot.",
+    instructions:
+      "Send payment to the NayaPay account shown here, then submit your Transaction ID and screenshot. Account details to be added by the store owner.",
+  },
 ];
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {

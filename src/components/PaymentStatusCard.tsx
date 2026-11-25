@@ -3,7 +3,7 @@
  *
  * Shows the payment status with the exact labels from the proposal (§6):
  * Pending Verification / Approved / Rejected / COD — Due / Paid.
- * For EasyPaisa / JazzCash with no evidence yet it links to the
+ * For wallet payments with no evidence yet it links to the
  * payment-submission page; for a rejected payment it invites resubmission.
  */
 import Link from "next/link";

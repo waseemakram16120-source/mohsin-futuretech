@@ -37,8 +37,8 @@ export default async function Home() {
             </h1>
             <p className="mt-4 max-w-lg leading-relaxed text-zinc-300">
               Shop quality jeans, jackets, shirts, trousers and accessories
-              from {STORE_NAME}. Cash on Delivery, EasyPaisa and JazzCash
-              accepted — delivered across Pakistan.
+              from {STORE_NAME}. Cash on Delivery, EasyPaisa, JazzCash and
+              NayaPay accepted — delivered across Pakistan.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
@@ -77,7 +77,7 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-5 text-center sm:px-6 lg:grid-cols-4">
           {[
             { title: "Cash on Delivery", text: "Pay when it arrives" },
-            { title: "EasyPaisa & JazzCash", text: "Manual verification" },
+            { title: "EasyPaisa, JazzCash & NayaPay", text: "Manual verification" },
             { title: "Delivery Across Pakistan", text: "Flat Rs 200 · Free above Rs 5,000" },
             { title: "Quality Checked", text: "Every item inspected" },
           ].map((item) => (
@@ -241,8 +241,8 @@ export default async function Home() {
         </div>
         <p className="mt-8 text-center text-sm text-zinc-500">
           {allProducts.length} products · Free delivery on orders of{" "}
-          {formatPKR(FREE_DELIVERY_THRESHOLD)} or more · COD, EasyPaisa &amp;
-          JazzCash accepted
+          {formatPKR(FREE_DELIVERY_THRESHOLD)} or more · COD, EasyPaisa,
+          JazzCash &amp; NayaPay accepted
         </p>
       </section>
     </main>

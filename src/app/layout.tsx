@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mohsin FutureTech — Online Fashion Store",
   description:
-    "Mohsin FutureTech online fashion & clothing store. Browse collections, shop jeans, jackets, shirts and more — COD, EasyPaisa and JazzCash accepted.",
+    "Mohsin FutureTech online fashion & clothing store. Browse collections, shop jeans, jackets, shirts and more — COD, EasyPaisa, JazzCash and NayaPay accepted.",
 };
 
 // The layout fetches categories from Supabase (via the cookie-based server

@@ -1,7 +1,7 @@
 /**
  * Submit payment evidence (Step 4) — /pay/[orderNumber].
  *
- * For EasyPaisa / JazzCash orders: shows the payment instructions and a
+ * For wallet orders (EasyPaisa / JazzCash / NayaPay): shows the payment instructions and a
  * form for the Transaction ID + receipt screenshot. The submission goes
  * to POST /api/payments (validated server-side). COD orders see no form —
  * they pay cash on delivery.
@@ -264,7 +264,13 @@ function PayContent() {
   const paymentMethod = (demoOrder?.paymentMethod ?? liveOrder!.payment_method) as PaymentMethod;
   const total = demoOrder?.totalAmount ?? liveOrder!.total_amount;
   const methodLabel =
-    paymentMethod === "easypaisa" ? "EasyPaisa" : paymentMethod === "jazzcash" ? "JazzCash" : "Cash on Delivery";
+    paymentMethod === "easypaisa"
+      ? "EasyPaisa"
+      : paymentMethod === "jazzcash"
+        ? "JazzCash"
+        : paymentMethod === "nayapay"
+          ? "NayaPay"
+          : "Cash on Delivery";
 
   const livePayment = liveOrder?.payments?.[0];
   const paymentStatus = demoOrder?.paymentStatus ?? livePayment?.status ?? "pending_verification";

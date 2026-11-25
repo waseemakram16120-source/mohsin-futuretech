@@ -1,7 +1,7 @@
 /**
  * Payment instructions & validation (Step 4 — manual verification only).
  *
- * EasyPaisa / JazzCash are NEVER an automatic gateway: the customer pays
+ * Wallet payments (EasyPaisa / JazzCash / NayaPay) are NEVER an automatic gateway: the customer pays
  * in their own wallet app, then submits a Transaction ID + receipt
  * screenshot here. An admin reviews it in Step 5. No automatic
  * gateway integration is included, per the proposal (§4, §6, §13).
@@ -11,7 +11,7 @@
  */
 import type { PaymentMethod, PaymentStatus } from "./types";
 
-export type WalletMethod = "easypaisa" | "jazzcash";
+export type WalletMethod = "easypaisa" | "jazzcash" | "nayapay";
 
 export interface PaymentAccount {
   method: WalletMethod;
@@ -24,15 +24,24 @@ export interface PaymentAccount {
 
 /** Read the store's wallet accounts from env (set in .env.local). */
 export function getPaymentAccount(method: WalletMethod): PaymentAccount {
-  const label = method === "easypaisa" ? "EasyPaisa" : "JazzCash";
+  const label =
+    method === "easypaisa"
+      ? "EasyPaisa"
+      : method === "jazzcash"
+        ? "JazzCash"
+        : "NayaPay";
   const name =
     method === "easypaisa"
       ? process.env.NEXT_PUBLIC_EASYPAISA_ACCOUNT_NAME
-      : process.env.NEXT_PUBLIC_JAZZCASH_ACCOUNT_NAME;
+      : method === "jazzcash"
+        ? process.env.NEXT_PUBLIC_JAZZCASH_ACCOUNT_NAME
+        : process.env.NEXT_PUBLIC_NAYAPAY_ACCOUNT_NAME;
   const number =
     method === "easypaisa"
       ? process.env.NEXT_PUBLIC_EASYPAISA_ACCOUNT_NUMBER
-      : process.env.NEXT_PUBLIC_JAZZCASH_ACCOUNT_NUMBER;
+      : method === "jazzcash"
+        ? process.env.NEXT_PUBLIC_JAZZCASH_ACCOUNT_NUMBER
+        : process.env.NEXT_PUBLIC_NAYAPAY_ACCOUNT_NUMBER;
   const accountName = name?.trim() ? name.trim() : null;
   const accountNumber = number?.trim() ? number.trim() : null;
   return {
@@ -49,7 +58,12 @@ export function getPaymentSteps(
   method: WalletMethod,
   amountText: string,
 ): string[] {
-  const label = method === "easypaisa" ? "EasyPaisa" : "JazzCash";
+  const label =
+    method === "easypaisa"
+      ? "EasyPaisa"
+      : method === "jazzcash"
+        ? "JazzCash"
+        : "NayaPay";
   return [
     `Open your ${label} app on your phone.`,
     `Send ${amountText} to the ${label} account shown above.`,

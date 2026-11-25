@@ -1,7 +1,7 @@
 /**
  * /admin/payments — payment approval & verification (PDF §6).
  *
- * Lists EasyPaisa/JazzCash submissions (Transaction ID, receipt, order,
+ * Lists wallet submissions (EasyPaisa / JazzCash / NayaPay — Transaction ID, receipt, order,
  * customer) with Approve / Reject (reason required) and the COD list
  * with Mark Paid. Live via API, demo via local orders.
  */
@@ -108,10 +108,10 @@ export default function AdminPaymentsPage() {
       )}
 
       <h2 className="mb-2 font-semibold text-[#0f2440]">
-        EasyPaisa / JazzCash submissions
+        EasyPaisa / JazzCash / NayaPay submissions
       </h2>
       {payments.length === 0 ? (
-        <EmptyState message="No EasyPaisa / JazzCash payments yet. When a customer submits Transaction ID + screenshot, it appears here as Pending Verification." />
+        <EmptyState message="No wallet payments yet. When a customer submits Transaction ID + screenshot, it appears here as Pending Verification." />
       ) : (
         <div className="space-y-3">
           {payments.map((p) => (

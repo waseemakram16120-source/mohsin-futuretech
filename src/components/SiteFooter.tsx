@@ -82,7 +82,7 @@ export default function SiteFooter({
             Payment Methods
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {["Cash on Delivery", "EasyPaisa", "JazzCash"].map((method) => (
+            {["Cash on Delivery", "EasyPaisa", "JazzCash", "NayaPay"].map((method) => (
               <span
                 key={method}
                 className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-bold text-white"
@@ -92,8 +92,9 @@ export default function SiteFooter({
             ))}
           </div>
           <p className="mt-4 text-sm leading-relaxed">
-            EasyPaisa / JazzCash payments are verified manually by our team
-            before your order is confirmed. No automatic payment gateway.
+            EasyPaisa / JazzCash / NayaPay payments are verified manually by
+            our team before your order is confirmed. No automatic payment
+            gateway.
           </p>
           <p className="mt-4 text-sm">
             Delivery across Pakistan · Flat {formatPKR(DELIVERY_CHARGES_FLAT)}{" "}
@@ -104,7 +105,7 @@ export default function SiteFooter({
 
       <div className="border-t border-white/10 py-4 text-center text-xs text-zinc-400">
         © 2026 {STORE_NAME}. All rights reserved. ·
-        Cash on Delivery · EasyPaisa · JazzCash
+        Cash on Delivery · EasyPaisa · JazzCash · NayaPay
       </div>
     </footer>
   );

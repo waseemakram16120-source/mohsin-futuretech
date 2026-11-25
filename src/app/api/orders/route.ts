@@ -77,7 +77,7 @@ export async function POST(request: Request) {
   }
 
   const paymentMethod = payload.paymentMethod as PaymentMethod | undefined;
-  if (!paymentMethod || !["cod", "easypaisa", "jazzcash"].includes(paymentMethod)) {
+  if (!paymentMethod || !["cod", "easypaisa", "jazzcash", "nayapay"].includes(paymentMethod)) {
     return badRequest("Please select a payment method.");
   }
 

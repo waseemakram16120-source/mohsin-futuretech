@@ -74,7 +74,7 @@ export default function AdminDashboardPage() {
         <StatCard
           label="Pending payments"
           value={String(overview.pendingPayments)}
-          sub="EasyPaisa / JazzCash awaiting verification"
+          sub="Wallet payments awaiting verification"
         />
         <StatCard
           label="Low stock"
@@ -157,7 +157,8 @@ export default function AdminDashboardPage() {
 
       <p className="mt-4 text-xs text-zinc-500">
         Pending orders need review: confirm the order, verify the payment if
-        EasyPaisa / JazzCash, then move it to Processing → Shipped → Delivered.
+        a wallet method (EasyPaisa / JazzCash / NayaPay), then move it to
+        Processing → Shipped → Delivered.
       </p>
     </div>
   );

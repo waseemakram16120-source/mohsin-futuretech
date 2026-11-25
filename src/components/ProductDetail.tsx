@@ -350,8 +350,8 @@ export default function ProductDetail({ product }: { product: StoreProduct }) {
           </p>
           <p className="mt-1">
             <span className="font-semibold text-zinc-900">Payment:</span> Cash
-            on Delivery, EasyPaisa or JazzCash. EasyPaisa / JazzCash payments
-            are verified manually by our team.
+            on Delivery, EasyPaisa, JazzCash or NayaPay. EasyPaisa / JazzCash
+            / NayaPay payments are verified manually by our team.
           </p>
           <p className="mt-2">
             <Link

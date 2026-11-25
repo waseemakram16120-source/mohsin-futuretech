@@ -110,6 +110,7 @@ export default function AdminOrdersPage() {
           <option value="cod">Cash on Delivery</option>
           <option value="easypaisa">EasyPaisa</option>
           <option value="jazzcash">JazzCash</option>
+          <option value="nayapay">NayaPay</option>
         </select>
         <select
           value={sort}

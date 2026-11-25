@@ -4,8 +4,8 @@
  * Delivery details + payment method + order summary, with full inline
  * validation before submit (PDF §3). Guest checkout is allowed; signed-in
  * customers get their profile and saved addresses pre-filled. The payment
- * method is only SELECTED here — EasyPaisa / JazzCash Transaction ID and
- * receipt-screenshot submission arrive in Step 4.
+ * method is only SELECTED here — wallet (EasyPaisa / JazzCash / NayaPay)
+ * Transaction ID and receipt-screenshot submission arrive in Step 4.
  */
 "use client";
 
@@ -318,7 +318,9 @@ export default function CheckoutPage() {
   const errorClass = "mt-1 text-xs font-semibold text-red-600";
   const method = PAYMENT_METHODS.find((m) => m.value === paymentMethod)!;
   const walletAccount =
-    paymentMethod === "easypaisa" || paymentMethod === "jazzcash"
+    paymentMethod === "easypaisa" ||
+    paymentMethod === "jazzcash" ||
+    paymentMethod === "nayapay"
       ? getPaymentAccount(paymentMethod)
       : null;
 

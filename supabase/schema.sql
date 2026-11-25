@@ -27,7 +27,7 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 do $$ begin
-  create type public.payment_method as enum ('cod', 'easypaisa', 'jazzcash');
+  create type public.payment_method as enum ('cod', 'easypaisa', 'jazzcash', 'nayapay');
 exception when duplicate_object then null; end $$;
 
 do $$ begin

@@ -1,11 +1,11 @@
 /**
  * Payments API (Step 4 — manual verification only).
  *
- * POST /api/payments — submit EasyPaisa / JazzCash payment evidence
+ * POST /api/payments — submit wallet payment evidence
  * (Transaction ID + receipt screenshot) for an order.
  *
  * Validation (server-side, always re-checked — never trust the client):
- *  - order exists, payment method is EasyPaisa / JazzCash (not COD)
+ *  - order exists, payment method is a wallet method (not COD)
  *  - payment not already Approved / Paid, and not already submitted
  *    (Pending Verification with a Transaction ID on file)
  *  - Transaction ID present and well-formed
@@ -122,8 +122,8 @@ export async function POST(request: Request) {
       "This is a Cash on Delivery order — no payment evidence is needed.",
     );
   }
-  if (!["easypaisa", "jazzcash"].includes(orderRow.payment_method)) {
-    return badRequest("This order does not use EasyPaisa or JazzCash.");
+  if (!["easypaisa", "jazzcash", "nayapay"].includes(orderRow.payment_method)) {
+    return badRequest("This order does not use a wallet payment (EasyPaisa, JazzCash or NayaPay).");
   }
 
   // Authorisation: the signed-in owner, or the delivery phone.
