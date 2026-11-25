@@ -163,14 +163,14 @@ export default function ShopFilters({
             type="number"
             min={priceBounds.min}
             max={priceBounds.max}
-            placeholder={`Min ${priceBounds.min}`}
+            placeholder="Min"
             defaultValue={filters.minPrice ?? ""}
             key={`min-${filters.minPrice ?? ""}`}
             onBlur={(e) => setParam("min", e.target.value || null)}
             onKeyDown={(e) => {
               if (e.key === "Enter") setParam("min", e.currentTarget.value || null);
             }}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-[#0f2440]"
+            className="w-full min-w-0 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-[#0f2440]"
             aria-label="Minimum price"
           />
           <span className="text-zinc-400">–</span>
@@ -178,14 +178,14 @@ export default function ShopFilters({
             type="number"
             min={priceBounds.min}
             max={priceBounds.max}
-            placeholder={`Max ${priceBounds.max}`}
+            placeholder="Max"
             defaultValue={filters.maxPrice ?? ""}
             key={`max-${filters.maxPrice ?? ""}`}
             onBlur={(e) => setParam("max", e.target.value || null)}
             onKeyDown={(e) => {
               if (e.key === "Enter") setParam("max", e.currentTarget.value || null);
             }}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-[#0f2440]"
+            className="w-full min-w-0 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-[#0f2440]"
             aria-label="Maximum price"
           />
         </div>

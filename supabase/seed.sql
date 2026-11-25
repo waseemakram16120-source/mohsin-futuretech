@@ -41,7 +41,7 @@ values
   ('b0000000-0000-4000-8000-000000000008', 'a0000000-0000-4000-8000-000000000005', 'Women''s Floral Lawn Shirt',    'womens-floral-lawn-shirt',    'Lightweight floral lawn shirt, perfect for summer days.',                                       2799, 3499, true,  true,  true),
   ('b0000000-0000-4000-8000-000000000009', 'a0000000-0000-4000-8000-000000000006', 'Men''s Chino Trousers',         'mens-chino-trousers',         'Stretch chino trousers with a tapered leg and clean finish.',                                     2999, 3999, false, false, true),
   ('b0000000-0000-4000-8000-000000000010', 'a0000000-0000-4000-8000-000000000006', 'Men''s Formal Dress Trousers',  'mens-formal-dress-trousers',  'Flat-front formal trousers in wrinkle-resistant fabric.',                                       3299, null, false, false, true),
-  ('b0000000-0000-4000-8000-000000000011', 'a0000000-0000-4000-8000-000000000001', 'Men''s Pique Polo T-Shirt',     'mens-pique-polo-tshirt',      'Classic pique polo t-shirt in breathable cotton.',                                             1499, 1999, false, true,  true),
+  ('b0000000-0000-4000-8000-000000000011', 'a0000000-0000-4000-8000-000000000005', 'Men''s Pique Polo T-Shirt',     'mens-pique-polo-tshirt',      'Classic pique polo t-shirt in breathable cotton.',                                             1499, 1999, false, true,  true),
   ('b0000000-0000-4000-8000-000000000012', 'a0000000-0000-4000-8000-000000000007', 'Men''s Leather Belt',           'mens-leather-belt',           'Genuine leather belt with a polished metal buckle.',                                          1299, 1799, false, false, true)
 on conflict (slug) do nothing;
 

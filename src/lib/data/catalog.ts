@@ -64,13 +64,39 @@ export function parseShopFilters(
   };
 }
 
+/**
+ * Does a product belong to a category slug? Gender categories (men / women)
+ * also match by the product name prefix ("Men's …" / "Women's …"), because
+ * the catalogue mixes gender and garment-type categories and each product
+ * has a single category — e.g. a men's shirt lives in "shirts", not "men".
+ * Garment categories match by categorySlug only.
+ */
+export function matchesCategory(
+  product: StoreProduct,
+  slug: string,
+): boolean {
+  if (slug === "men") {
+    return (
+      product.categorySlug === "men" ||
+      product.name.toLowerCase().startsWith("men's")
+    );
+  }
+  if (slug === "women") {
+    return (
+      product.categorySlug === "women" ||
+      product.name.toLowerCase().startsWith("women's")
+    );
+  }
+  return product.categorySlug === slug;
+}
+
 export function applyFilters(
   products: StoreProduct[],
   filters: ShopFilters,
 ): StoreProduct[] {
   let list = [...products];
   if (filters.category) {
-    list = list.filter((p) => p.categorySlug === filters.category);
+    list = list.filter((p) => matchesCategory(p, filters.category));
   }
   if (filters.q) {
     const q = filters.q.trim().toLowerCase();

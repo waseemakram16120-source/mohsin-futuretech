@@ -13,6 +13,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import { matchesCategory } from "./catalog";
 import { LOCAL_CATEGORIES, type StoreCategory } from "./categories";
 import {
   COLOR_HEX,
@@ -178,7 +179,8 @@ export async function getProductsByCategory(
   categorySlug: string,
 ): Promise<StoreProduct[]> {
   const products = await getProducts();
-  return products.filter((p) => p.categorySlug === categorySlug);
+  // Men / Women match by name prefix too (see matchesCategory in catalog.ts).
+  return products.filter((p) => matchesCategory(p, categorySlug));
 }
 
 export async function getFeaturedProducts(): Promise<StoreProduct[]> {

@@ -19,10 +19,10 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
   const discount = discountPercent(product);
   const stock = totalStock(product);
   const outOfStock = stock <= 0;
-  const badge = product.isNew
-    ? { label: "New", classes: "bg-emerald-600 text-white" }
-    : discount > 0
-      ? { label: `Sale −${discount}%`, classes: "bg-red-600 text-white" }
+  const badge = discount > 0
+    ? { label: `Sale −${discount}%`, classes: "bg-red-600 text-white" }
+    : product.isNew
+      ? { label: "New", classes: "bg-emerald-600 text-white" }
       : product.isFeatured
         ? { label: "Featured", classes: "bg-[#0f2440] text-white" }
         : null;

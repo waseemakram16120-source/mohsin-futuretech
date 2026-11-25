@@ -154,7 +154,7 @@ export default function CartPage() {
                   type="text"
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value)}
-                  placeholder="WELCOME10"
+                  placeholder="Enter coupon code"
                   className="min-w-0 flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm uppercase outline-none focus:border-[#0f2440]"
                 />
                 <button

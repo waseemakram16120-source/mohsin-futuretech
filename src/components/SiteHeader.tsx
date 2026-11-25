@@ -41,7 +41,7 @@ export default function SiteHeader({
     <header className="sticky top-0 z-40 bg-white shadow-sm">
       {/* Top strip */}
       <div className="bg-[#0f2440] px-4 py-1.5 text-center text-xs font-medium text-white sm:text-sm">
-        Free delivery on orders above {formatPKR(FREE_DELIVERY_THRESHOLD)} · Winter Sale — Up to 30% Off · Use code <span className="font-bold text-amber-400">WELCOME10</span> for 10% off
+        Free delivery on orders of {formatPKR(FREE_DELIVERY_THRESHOLD)} or more · Winter Sale — Up to 28% Off · Use code <span className="font-bold text-amber-400">WELCOME10</span> for 10% off
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6">

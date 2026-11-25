@@ -51,7 +51,7 @@ export default async function Home() {
                 href="/shop?sale=1"
                 className="rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
               >
-                Winter Sale — Up to 30% Off
+                Winter Sale — Up to 28% Off
               </Link>
             </div>
             <p className="mt-4 text-sm text-zinc-300">
@@ -141,7 +141,7 @@ export default async function Home() {
             </span>
             <span>
               <span className="block text-2xl font-extrabold">
-                Up to 30% Off
+                Up to 28% Off
               </span>
               <span className="mt-1 block text-sm text-red-100">
                 Selected jeans, jackets &amp; shirts.
@@ -184,8 +184,8 @@ export default async function Home() {
             Get 10% off with code WELCOME10
           </p>
           <p className="mt-2 text-sm text-amber-900">
-            Valid on orders of {formatPKR(2000)} or more. Apply the code at
-            checkout — coming in Step 3.
+            Valid on orders of {formatPKR(2000)} or more. Apply the code in
+            the coupon box on the Cart page.
           </p>
           <Link
             href="/shop"
