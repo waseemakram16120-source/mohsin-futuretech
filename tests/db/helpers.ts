@@ -107,7 +107,7 @@ export class Db {
   async placeOrder(opts: {
     userId?: string | null;
     items: Array<{ variant_id: string; quantity: number }>;
-    method?: "cod" | "easypaisa" | "jazzcash" | "nayapay";
+    method?: "cod" | "easypaisa" | "jazzcash";
     coupon?: string | null;
     phone?: string;
   }) {

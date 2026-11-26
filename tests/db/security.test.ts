@@ -7,7 +7,7 @@ import {
   STOCK_REASONS,
   USER_ROLES,
 } from "@/lib/domain";
-import { PAYMENT_METHODS } from "@/config/store";
+import { ALL_PAYMENT_METHODS } from "@/config/store";
 import { withTx } from "./helpers";
 
 describe("schema guarantees", () => {
@@ -50,13 +50,17 @@ describe("schema guarantees", () => {
            from pg_proc p join pg_namespace n on n.oid = p.pronamespace
           where n.nspname = 'public'
             and p.proname in ('place_order', 'submit_payment_evidence', 'get_order_details',
-                              'resolve_order_access', 'generate_order_number')`,
+                              'resolve_order_access', 'generate_order_number', 'start_payment_attempt',
+                              'apply_payment_event', 'payment_attempts_to_reconcile', 'order_payment_state')`,
       );
-      expect(rows).toHaveLength(5);
+      expect(rows).toHaveLength(9);
       for (const row of rows) {
         expect({ fn: row.fn, anon: row.anon, auth: row.auth }).toEqual({ fn: row.fn, anon: false, auth: false });
       }
-      expect(rows.filter((r) => r.fn !== "generate_order_number").every((r) => r.service)).toBe(true);
+      // submit_payment_evidence is retired (receipts never mark anything paid).
+      const serverFns = rows.filter((r) => !["generate_order_number", "submit_payment_evidence"].includes(r.fn));
+      expect(serverFns.every((r) => r.service)).toBe(true);
+      expect(rows.find((r) => r.fn === "submit_payment_evidence")?.service).toBe(false);
     });
   });
 
@@ -72,7 +76,7 @@ describe("schema guarantees", () => {
         ).map((r) => r.v);
       expect(await enumValues("order_status")).toEqual([...ORDER_STATUSES]);
       expect(await enumValues("payment_status")).toEqual([...PAYMENT_STATUSES]);
-      expect(await enumValues("payment_method")).toEqual([...PAYMENT_METHODS]);
+      expect(await enumValues("payment_method")).toEqual([...ALL_PAYMENT_METHODS]);
       expect(await enumValues("audience")).toEqual([...AUDIENCES]);
       expect(await enumValues("discount_type")).toEqual([...DISCOUNT_TYPES]);
       expect(await enumValues("stock_reason")).toEqual([...STOCK_REASONS]);

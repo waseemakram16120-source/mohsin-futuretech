@@ -72,6 +72,13 @@ run against the same Postgres 17 / PostgREST / Auth / Storage as hosted
 Supabase. E2E tests read its URL and demo keys automatically and never touch a
 real project.
 
+## Payments
+
+COD, JazzCash and Easypaisa. The direct merchant gateway core (attempts,
+verification pipeline, idempotency, replay protection) is built and tested;
+the JazzCash/Easypaisa adapters stay disabled until the official merchant
+integration guides and credentials are provided. See [docs/PAYMENTS.md](docs/PAYMENTS.md).
+
 ## Security model (summary)
 
 - RLS is enabled and forced on every table; table privileges are narrowed too.

@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { PAYMENT_METHOD_LABELS, PAYMENT_METHODS, isWalletMethod, storeConfig } from "@/config/store";
+import { ALL_PAYMENT_METHODS, PAYMENT_METHOD_LABELS, PAYMENT_METHODS, isGatewayMethod, storeConfig } from "@/config/store";
 
 describe("store config", () => {
-  it("offers COD, EasyPaisa, JazzCash and NayaPay", () => {
-    expect(PAYMENT_METHODS).toEqual(["cod", "easypaisa", "jazzcash", "nayapay"]);
-    expect(Object.keys(PAYMENT_METHOD_LABELS)).toEqual([...PAYMENT_METHODS]);
-    expect(isWalletMethod("cod")).toBe(false);
-    expect(isWalletMethod("easypaisa")).toBe(true);
-    expect(isWalletMethod("card")).toBe(false);
+  it("offers COD, JazzCash and Easypaisa (NayaPay kept only for old orders)", () => {
+    expect(PAYMENT_METHODS).toEqual(["cod", "jazzcash", "easypaisa"]);
+    expect(Object.keys(PAYMENT_METHOD_LABELS).sort()).toEqual([...ALL_PAYMENT_METHODS].sort());
+    expect(isGatewayMethod("cod")).toBe(false);
+    expect(isGatewayMethod("easypaisa")).toBe(true);
+    expect(isGatewayMethod("nayapay")).toBe(false);
+    expect(isGatewayMethod("card")).toBe(false);
   });
 
   it("limits uploads to JPG/PNG/WebP up to 5 MB", () => {

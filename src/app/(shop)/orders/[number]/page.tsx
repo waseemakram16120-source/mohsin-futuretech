@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PAYMENT_METHOD_LABELS, isWalletMethod } from "@/config/store";
+import { PAYMENT_METHOD_LABELS, isGatewayMethod } from "@/config/store";
+import { PaymentPanel } from "@/components/payments/PaymentPanel";
 import { TotalsTable } from "@/components/cart/CartSummary";
 import { Breadcrumbs } from "@/components/listing/ListingPage";
 import { ProductImage } from "@/components/product/ProductImage";
@@ -12,18 +13,21 @@ import { formatPkPhone } from "@/lib/checkout/phone";
 import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/lib/domain";
 import { formatPrice } from "@/lib/format";
 import { getOrderPlacedHere } from "@/lib/orders/queries";
+import { providerFor } from "@/lib/payments/registry";
+import { paymentState } from "@/lib/payments/service";
+import type { AttemptStatus } from "@/lib/payments/status";
 import { whatsappLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = { title: "Your order", robots: { index: false } };
 
-type Props = { params: Promise<{ number: string }>; searchParams: Promise<{ placed?: string }> };
+type Props = { params: Promise<{ number: string }>; searchParams: Promise<{ placed?: string; payment?: string }> };
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat("en-PK", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Karachi" }).format(new Date(iso));
 }
 
 export default async function OrderPage({ params, searchParams }: Props) {
-  const [{ number }, { placed }] = await Promise.all([params, searchParams]);
+  const [{ number }, { placed, payment }] = await Promise.all([params, searchParams]);
   const [order, settings] = await Promise.all([getOrderPlacedHere(number), getStoreSettings()]);
 
   if (!order) {
@@ -48,8 +52,9 @@ export default async function OrderPage({ params, searchParams }: Props) {
     );
   }
 
-  const wallet = isWalletMethod(order.payment_method) ? order.payment_method : null;
-  const account = wallet ? settings.wallets[wallet] : null;
+  const gateway = isGatewayMethod(order.payment_method) ? order.payment_method : null;
+  const state = gateway ? await paymentState(order.order_number) : null;
+  const provider = gateway ? providerFor(gateway) : null;
   const totals = {
     subtotal: order.subtotal,
     discount: order.discount_amount,
@@ -93,27 +98,28 @@ export default async function OrderPage({ params, searchParams }: Props) {
             <h2 id="next-steps" className="font-display text-2xl">
               What happens next
             </h2>
-            {wallet ? (
-              <div className="mt-4 space-y-4 text-sm leading-relaxed">
-                <p>
-                  Please send <strong>{formatPrice(order.total_amount)}</strong> to our {PAYMENT_METHOD_LABELS[wallet]} account, then
-                  submit your Transaction ID and payment screenshot. Your order stays <strong>Pending Verification</strong> until our
-                  team confirms the payment.
-                </p>
-                <dl className="grid gap-2 rounded-card bg-accent-soft p-4 sm:grid-cols-2" data-testid="wallet-account">
-                  <div>
-                    <dt className="text-xs text-ink-soft">{PAYMENT_METHOD_LABELS[wallet]} account name</dt>
-                    <dd className="font-semibold">{account?.accountName ?? "Will be shared on WhatsApp"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-ink-soft">Account number</dt>
-                    <dd className="font-mono font-semibold">{account?.accountNumber ?? "—"}</dd>
-                  </div>
-                </dl>
-                <ButtonLink href={`/pay/${order.order_number}`} size="lg">
-                  Submit payment proof
-                </ButtonLink>
-              </div>
+            {gateway && state ? (
+              <>
+                {provider?.id === "test" ? (
+                  <p className="mt-3 rounded-xs border border-warning/40 bg-warning-soft px-3 py-2 text-xs font-medium text-warning">
+                    Sandbox mode: payments use the internal TEST gateway — no real money is charged.
+                  </p>
+                ) : null}
+                <PaymentPanel
+                  orderNumber={order.order_number}
+                  method={gateway}
+                  available={provider !== null}
+                  returned={payment === "return"}
+                  initial={{
+                    paymentStatus: state.payment_status,
+                    orderStatus: state.order_status,
+                    totalMinor: Number(state.total_minor),
+                    attempt: state.latest_attempt
+                      ? { status: state.latest_attempt.status as AttemptStatus, failureMessage: state.latest_attempt.failure_message }
+                      : null,
+                  }}
+                />
+              </>
             ) : (
               <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm leading-relaxed">
                 <li>Our team reviews and confirms your order (we may call {formatPkPhone(order.delivery_phone)}).</li>

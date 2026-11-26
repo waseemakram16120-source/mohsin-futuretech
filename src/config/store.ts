@@ -51,19 +51,25 @@ export const storeConfig = {
   },
 } as const;
 
-export const PAYMENT_METHODS = ["cod", "easypaisa", "jazzcash", "nayapay"] as const;
+/** Every method the database knows (includes retired NayaPay for old orders). */
+export const ALL_PAYMENT_METHODS = ["cod", "easypaisa", "jazzcash", "nayapay"] as const;
+export type AnyPaymentMethod = (typeof ALL_PAYMENT_METHODS)[number];
+
+/** Methods offered at checkout. JazzCash/Easypaisa also need an enabled gateway. */
+export const PAYMENT_METHODS = ["cod", "jazzcash", "easypaisa"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
-export const WALLET_METHODS = ["easypaisa", "jazzcash", "nayapay"] as const;
-export type WalletMethod = (typeof WALLET_METHODS)[number];
+/** Methods paid online through a direct merchant gateway. */
+export const GATEWAY_METHODS = ["jazzcash", "easypaisa"] as const;
+export type GatewayMethod = (typeof GATEWAY_METHODS)[number];
 
-export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+export const PAYMENT_METHOD_LABELS: Record<AnyPaymentMethod, string> = {
   cod: "Cash on Delivery",
-  easypaisa: "EasyPaisa",
   jazzcash: "JazzCash",
+  easypaisa: "Easypaisa",
   nayapay: "NayaPay",
 };
 
-export function isWalletMethod(method: string): method is WalletMethod {
-  return (WALLET_METHODS as readonly string[]).includes(method);
+export function isGatewayMethod(method: string): method is GatewayMethod {
+  return (GATEWAY_METHODS as readonly string[]).includes(method);
 }

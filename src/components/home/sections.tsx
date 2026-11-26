@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { PAYMENT_METHOD_LABELS, WALLET_METHODS } from "@/config/store";
+import { GATEWAY_METHODS, PAYMENT_METHOD_LABELS } from "@/config/store";
 import { ProductCard } from "@/components/product/ProductCard";
 import { ProductImage } from "@/components/product/ProductImage";
 import { ButtonLink } from "@/components/ui/Button";
@@ -140,8 +140,8 @@ export function TrustStrip({ freeDeliveryMin }: { freeDeliveryMin: number }) {
   const items: Array<{ icon: IconName; title: string; text: string }> = [
     { icon: "truck", title: "Nationwide delivery", text: `Free on orders of ${formatPrice(freeDeliveryMin)} or more` },
     { icon: "cash", title: "Cash on Delivery", text: "Pay when your parcel arrives" },
-    { icon: "wallet", title: "Mobile wallets", text: WALLET_METHODS.map((m) => PAYMENT_METHOD_LABELS[m]).join(" · ") },
-    { icon: "shield", title: "Verified payments", text: "Every wallet payment checked by our team" },
+    { icon: "wallet", title: "Mobile wallets", text: GATEWAY_METHODS.map((m) => PAYMENT_METHOD_LABELS[m]).join(" · ") },
+    { icon: "shield", title: "Secure payments", text: "Pay on the wallet’s own secure page" },
   ];
   return (
     <section aria-label="Why shop with us" className="border-b border-stone bg-surface">

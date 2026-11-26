@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PAYMENT_METHOD_LABELS, WALLET_METHODS, storeConfig } from "@/config/store";
+import { GATEWAY_METHODS, PAYMENT_METHOD_LABELS, storeConfig } from "@/config/store";
 import { sizeChartFor } from "@/config/size-guide";
 import { ProductRail } from "@/components/home/sections";
 import { Breadcrumbs } from "@/components/listing/ListingPage";
@@ -113,7 +113,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
             <li className="flex gap-3">
               <Icon name="cash" className="size-5 shrink-0 text-accent" />
               <span>
-                Pay with Cash on Delivery or {WALLET_METHODS.map((m) => PAYMENT_METHOD_LABELS[m]).join(", ").replace(/, ([^,]*)$/, " or $1")}.
+                Pay with Cash on Delivery, {GATEWAY_METHODS.map((m) => PAYMENT_METHOD_LABELS[m]).join(" or ")}.
               </span>
             </li>
             {askHref ? (

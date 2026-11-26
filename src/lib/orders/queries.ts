@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ORDER_COOKIE, verifyOrders } from "@/lib/checkout/order-access";
 import { orderCookieKey } from "@/lib/checkout/server-keys";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/domain";
-import { PAYMENT_METHODS } from "@/config/store";
+import { ALL_PAYMENT_METHODS } from "@/config/store";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const money = z.union([z.number(), z.string()]).transform(Number);
@@ -15,7 +15,7 @@ const orderSchema = z.object({
   order_number: z.string(),
   created_at: z.string(),
   status: z.enum(ORDER_STATUSES),
-  payment_method: z.enum(PAYMENT_METHODS),
+  payment_method: z.enum(ALL_PAYMENT_METHODS),
   payment_status: z.enum(PAYMENT_STATUSES),
   delivery_name: z.string(),
   delivery_phone: z.string(),

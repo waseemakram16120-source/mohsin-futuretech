@@ -48,9 +48,8 @@ test.describe("layout", () => {
     const footer = page.getByRole("contentinfo");
     await expect(footer.getByRole("list", { name: "Payment methods" }).getByRole("listitem")).toHaveText([
       "Cash on Delivery",
-      "EasyPaisa",
       "JazzCash",
-      "NayaPay",
+      "Easypaisa",
     ]);
     await expect(footer.getByRole("link", { name: "support@example.com" })).toBeVisible();
   });

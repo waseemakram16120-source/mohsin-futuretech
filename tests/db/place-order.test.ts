@@ -85,7 +85,7 @@ describe("place_order", () => {
   it("wallet orders start as awaiting payment", async () => {
     await withTx(async (db) => {
       const v = await db.variantWithStock(3);
-      for (const method of ["easypaisa", "jazzcash", "nayapay"] as const) {
+      for (const method of ["easypaisa", "jazzcash"] as const) {
         const result = await db.placeOrder({ items: [{ variant_id: v.id, quantity: 1 }], method });
         expect(result.payment_status).toBe("awaiting_payment");
       }

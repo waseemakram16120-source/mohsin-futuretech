@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS, storeConfig } from "@/config/store";
+import { PAYMENT_METHOD_LABELS, storeConfig, type PaymentMethod } from "@/config/store";
 import { Icon } from "@/components/ui/Icon";
 import type { StoreSettings } from "@/lib/catalog/mappers";
 import { formatPrice } from "@/lib/format";
@@ -25,7 +25,15 @@ function LinkList({ title, links }: { title: string; links: NavLink[] }) {
   );
 }
 
-export function Footer({ settings, shopLinks }: { settings: StoreSettings; shopLinks: NavLink[] }) {
+export function Footer({
+  settings,
+  shopLinks,
+  paymentMethods,
+}: {
+  settings: StoreSettings;
+  shopLinks: NavLink[];
+  paymentMethods: readonly PaymentMethod[];
+}) {
   const year = new Date().getFullYear();
   return (
     <footer className="mt-24 bg-ink text-surface">
@@ -63,7 +71,7 @@ export function Footer({ settings, shopLinks }: { settings: StoreSettings; shopL
           </ul>
           <h2 className="eyebrow mt-8 text-surface/60">We accept</h2>
           <ul className="mt-3 flex flex-wrap gap-2" aria-label="Payment methods">
-            {PAYMENT_METHODS.map((method) => (
+            {paymentMethods.map((method) => (
               <li
                 key={method}
                 className="rounded-xs border border-surface/25 px-2.5 py-1 text-xs font-medium text-surface/90"

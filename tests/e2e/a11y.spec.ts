@@ -70,7 +70,7 @@ test("bag, checkout (with errors) and order confirmation have no violations", as
   await page.getByLabel("Mobile number", { exact: true }).fill("03001234567");
   await page.getByLabel("Delivery address", { exact: true }).fill("House 9, Street 9, Model Town");
   await page.getByLabel("City", { exact: true }).fill("Lahore");
-  await page.getByRole("radio", { name: /JazzCash/ }).check();
+  await page.getByRole("radio", { name: /Cash on Delivery/ }).check();
   await page.getByRole("button", { name: /Place order/ }).filter({ visible: true }).click();
   await expect(page.getByTestId("order-number")).toBeVisible();
   expect(await scan()).toEqual([]);

@@ -8,6 +8,7 @@ import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { buildPrimaryNav } from "@/components/layout/nav";
 import type { Category } from "@/lib/catalog/mappers";
 import { getCategories, getStoreSettings } from "@/lib/catalog/queries";
+import { enabledPaymentMethods } from "@/lib/payments/registry";
 import { whatsappLink } from "@/lib/whatsapp";
 import "./globals.css";
 
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     default: `${storeConfig.name} — Menswear & Womenswear Online in Pakistan`,
     template: `%s | ${storeConfig.name}`,
   },
-  description: `${storeConfig.tagline} Jackets, jeans, shirts, trousers and accessories. Cash on Delivery, EasyPaisa, JazzCash and NayaPay.`,
+  description: `${storeConfig.tagline} Jackets, jeans, shirts, trousers and accessories. Cash on Delivery, JazzCash and Easypaisa.`,
   openGraph: { type: "website", siteName: storeConfig.name, locale: "en_PK" },
 };
 
@@ -74,7 +75,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <main id="main" className="flex-1">
           {children}
         </main>
-        <Footer settings={settings} shopLinks={nav} />
+        <Footer settings={settings} shopLinks={nav} paymentMethods={enabledPaymentMethods()} />
         <WhatsAppButton href={whatsappHref} />
       </body>
     </html>

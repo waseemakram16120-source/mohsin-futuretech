@@ -20,7 +20,7 @@ const valid = {
     notes: "",
   },
   items: [{ variantId: variant, quantity: 2 }],
-  paymentMethod: "nayapay",
+  paymentMethod: "jazzcash",
   couponCode: " welcome10 ",
 };
 
@@ -41,13 +41,14 @@ describe("phone", () => {
 });
 
 describe("placeOrderSchema", () => {
-  it("cleans and accepts a valid order (all four payment methods)", () => {
+  it("cleans and accepts a valid order (COD, JazzCash, Easypaisa; not NayaPay)", () => {
     const r = placeOrderSchema.parse(valid);
     expect(r.customer).toMatchObject({ name: "Ali Khan", phone: "03001234567", email: "ali@example.com", postalCode: "75300" });
     expect(r.couponCode).toBe("WELCOME10");
-    for (const m of ["cod", "easypaisa", "jazzcash", "nayapay"]) {
+    for (const m of ["cod", "easypaisa", "jazzcash"]) {
       expect(placeOrderSchema.safeParse({ ...valid, paymentMethod: m }).success).toBe(true);
     }
+    expect(placeOrderSchema.safeParse({ ...valid, paymentMethod: "nayapay" }).success).toBe(false);
   });
 
   it("explains each invalid field", () => {

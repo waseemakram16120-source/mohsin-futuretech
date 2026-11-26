@@ -49,19 +49,29 @@ export default defineConfig({
     trace: "off",
   },
   projects: [
-    { name: "desktop", testIgnore: /checkout\.spec/, use: desktop },
-    { name: "mobile", testIgnore: /checkout\.spec/, use: mobile },
+    { name: "desktop", testIgnore: /(checkout|payments)\.spec/, use: desktop },
+    { name: "mobile", testIgnore: /(checkout|payments)\.spec/, use: mobile },
     // Checkout tests change stock, coupons and orders, so the two device
     // runs go one after the other instead of in parallel.
-    { name: "checkout-desktop", testMatch: /checkout\.spec/, use: desktop },
-    { name: "checkout-mobile", testMatch: /checkout\.spec/, use: mobile, dependencies: ["checkout-desktop"] },
+    { name: "checkout-desktop", testMatch: /(checkout|payments)\.spec/, use: desktop },
+    { name: "checkout-mobile", testMatch: /(checkout|payments)\.spec/, use: mobile, dependencies: ["checkout-desktop"] },
   ],
   webServer: {
     // Tests run against a fresh production build, like Vercel.
     command: "bash scripts/serve-e2e.sh",
     url: `http://localhost:${PORT}/api/health`,
     // Tests place many orders from one IP, so relax the per-IP order limit.
-    env: { ...localSupabaseEnv(), PORT: String(PORT), ORDER_RATE_LIMIT: "200" },
+    env: {
+      ...localSupabaseEnv(),
+      PORT: String(PORT),
+      ORDER_RATE_LIMIT: "200",
+      PAYMENT_RATE_LIMIT: "200",
+      // Sandbox only: the internal test gateway stands in for JazzCash /
+      // Easypaisa (whose adapters stay disabled until official docs arrive).
+      PAYMENTS_ENV: "sandbox",
+      PAYMENTS_TEST_GATEWAY: "1",
+      PAYMENTS_PUBLIC_BASE_URL: `http://localhost:${PORT}`,
+    },
     reuseExistingServer: false,
     timeout: 300_000,
   },

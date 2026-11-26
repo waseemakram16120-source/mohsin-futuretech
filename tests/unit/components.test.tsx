@@ -81,14 +81,13 @@ describe("MobileMenu", () => {
 });
 
 describe("Footer and WhatsApp", () => {
-  it("lists all four payment methods and the configured contact details", () => {
-    render(<Footer settings={mergeSettings({ support_email: "hello@shop.pk" })} shopLinks={[]} />);
+  it("lists the enabled payment methods and the configured contact details", () => {
+    render(<Footer settings={mergeSettings({ support_email: "hello@shop.pk" })} shopLinks={[]} paymentMethods={["cod", "jazzcash", "easypaisa"]} />);
     const methods = screen.getByRole("list", { name: "Payment methods" });
     expect(within(methods).getAllByRole("listitem").map((li) => li.textContent)).toEqual([
       "Cash on Delivery",
-      "EasyPaisa",
       "JazzCash",
-      "NayaPay",
+      "Easypaisa",
     ]);
     expect(screen.getByRole("link", { name: "hello@shop.pk" })).toHaveAttribute("href", "mailto:hello@shop.pk");
   });

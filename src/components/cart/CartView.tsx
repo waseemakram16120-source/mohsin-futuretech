@@ -6,7 +6,7 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/States";
-import { PAYMENT_METHOD_LABELS, PAYMENT_METHODS } from "@/config/store";
+import { PAYMENT_METHOD_LABELS, type PaymentMethod } from "@/config/store";
 import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
 import type { QuoteLine } from "@/lib/orders/quote";
@@ -129,7 +129,7 @@ export function CartSkeleton() {
   );
 }
 
-export function CartView() {
+export function CartView({ methods }: { methods: readonly PaymentMethod[] }) {
   const { state, lines, hydrated, coupon, retry } = useQuote();
   const quote = state.quote;
   const loading = state.status === "loading";
@@ -202,7 +202,7 @@ export function CartView() {
             </ButtonLink>
           )}
           <p className="text-center text-xs text-muted">
-            Pay with {PAYMENT_METHODS.map((m) => PAYMENT_METHOD_LABELS[m]).join(" · ")}
+            Pay with {methods.map((m) => PAYMENT_METHOD_LABELS[m]).join(" · ")}
           </p>
         </div>
       </aside>

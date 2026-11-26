@@ -99,7 +99,6 @@ test.describe("bag", () => {
 
 test.describe("checkout", () => {
   test("validates every field inline and in an error summary", async ({ page }) => {
-    const [{ n: ordersBefore }] = await sql<{ n: string }>("select count(*)::text as n from orders");
     await addToBag(page, CAP);
     await page.goto("/checkout");
     // The floating WhatsApp button is hidden so it never covers form fields.
@@ -113,8 +112,9 @@ test.describe("checkout", () => {
     await expect(summary).toContainText("Payment method: Please choose a payment method.");
     await expect(page.getByLabel("Full name", { exact: true })).toBeFocused();
     await expect(page.getByLabel("Mobile number", { exact: true })).toHaveAttribute("aria-invalid", "true");
-    const [{ n: ordersAfter }] = await sql<{ n: string }>("select count(*)::text as n from orders");
-    expect(ordersAfter).toBe(ordersBefore);
+    // Nothing was submitted: still on checkout with the bag intact.
+    await expect(page).toHaveURL(/\/checkout$/);
+    await expect(page.getByTestId("cart-count")).toHaveText("1");
   });
 
   test("places a COD order: confirmation, cart cleared, stock and DB updated", async ({ page }) => {
@@ -153,33 +153,6 @@ test.describe("checkout", () => {
     await expect(stranger.getByRole("heading", { name: "We can’t show this order here" })).toBeVisible();
     await expect(stranger.getByText("Ayesha")).toHaveCount(0);
     await stranger.close();
-  });
-
-  test("wallet order (NayaPay) with a coupon shows account details and Pending next step", async ({ page }) => {
-    await addToBag(page, OXFORD);
-    await page.goto("/cart");
-    await page.getByLabel("Coupon code").fill("WELCOME10");
-    await page.getByRole("button", { name: "Apply" }).click();
-    await expect(page.getByTestId("discount")).toHaveText("−Rs 300");
-    await page.getByRole("link", { name: "Checkout securely" }).click();
-
-    await fillCheckout(page);
-    await page.getByRole("radio", { name: /NayaPay/ }).check();
-    await expect(page.getByText(/see our NayaPay account details/)).toBeVisible();
-    await placeOrder(page);
-
-    await expect(page.getByTestId("order-number")).toBeVisible();
-    await expect(page.getByText("Payment: Awaiting Payment")).toBeVisible();
-    await expect(page.getByTestId("wallet-account")).toContainText("NayaPay account name");
-    await expect(page.getByRole("link", { name: "Submit payment proof" })).toHaveAttribute("href", /\/pay\/MF-/);
-    const number = (await page.getByTestId("order-number").textContent())!.trim();
-    const [o] = await sql<{ discount_amount: string; coupon_code: string; total_amount: string; payment_method: string }>(
-      "select discount_amount, coupon_code, total_amount, payment_method from orders where order_number = $1",
-      [number],
-    );
-    expect(o).toEqual({ discount_amount: "300.00", coupon_code: "WELCOME10", total_amount: "2949.00", payment_method: "nayapay" });
-    const [{ used_count }] = await sql<{ used_count: number }>("select used_count from coupons where code = 'WELCOME10'");
-    expect(used_count).toBeGreaterThanOrEqual(1);
   });
 
   test("selling out between the bag and payment is handled gracefully", async ({ page }) => {
