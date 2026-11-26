@@ -1,28 +1,24 @@
 import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
+import { getPublicEnv } from "@/lib/env";
 
 /**
- * Service-role Supabase client — SERVER ONLY.
+ * Service-role Supabase client — SERVER ONLY, bypasses RLS.
  *
- * Bypasses Row Level Security, so use it only in trusted server code
- * (admin actions, order processing, webhooks). Never import this file from
- * client components, and never expose SUPABASE_SERVICE_ROLE_KEY to the
- * browser. Throws a clear error when the key is not configured instead of
- * silently falling back to an unprivileged client.
+ * Used only for the few trusted operations that guests must be able to
+ * trigger (placing an order, submitting payment evidence, uploading a
+ * receipt). Those operations go through SECURITY DEFINER database functions
+ * that re-validate everything. Admin screens use the signed-in admin's own
+ * session (RLS + is_admin()) instead of this client.
  */
-export function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+export function createAdminClient() {
+  const env = getPublicEnv();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceRoleKey) {
-    throw new Error(
-      "Supabase service-role client is not configured. " +
-        "Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local.",
-    );
+  if (!serviceRoleKey) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set (server-only, see .env.example).");
   }
-
-  return createClient(url, serviceRoleKey, {
+  return createClient(env.NEXT_PUBLIC_SUPABASE_URL, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
