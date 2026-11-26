@@ -14,6 +14,10 @@ Supabase (Postgres, Auth, Storage) · Zod · Vitest · Playwright · Vercel.
 ```
 src/app/              routes (pages + API route handlers)
 src/config/store.ts   brand, contact, delivery & upload defaults (ONE place)
+src/app/globals.css   design tokens (colours, fonts, radius) — re-brand here
+src/components/ui/    design-system primitives (Button, Badge, Price, Icon, states)
+src/components/layout header, mobile menu, footer, WhatsApp button
+src/lib/catalog/      catalogue queries (cached 60 s) + Zod row mappers
 src/lib/domain.ts     order/payment statuses + workflow (mirrors DB enums)
 src/lib/env.ts        Zod-validated environment variables
 src/lib/supabase/     browser, server (RLS) and service-role clients
@@ -53,14 +57,17 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | Command | What it runs |
 |---|---|
 | `npm test` | Unit tests (Vitest, jsdom) |
-| `npm run db:start` | Starts a local Supabase Postgres in Docker and applies migrations + seed |
+| `npm run db:start` | Starts the local Supabase stack (Postgres, Auth, REST, Storage) in Docker; migrations + seed apply on first start |
+| `npm run db:env` | Prints the local Supabase URL and demo keys (copy into `.env.local` for local dev) |
 | `npm run test:db` | Database tests: RLS, order placement, payments, stock, concurrency |
-| `npm run db:reset` | Recreates the local database from scratch |
-| `npm run test:e2e` | Playwright on a production build (desktop + mobile) |
+| `npm run db:reset` | Re-applies every migration and the seed from scratch |
+| `npm run test:e2e` | Playwright on a production build against the local Supabase (desktop + mobile, incl. axe accessibility checks) |
 | `npm run lint` / `npm run typecheck` / `npm run build` | Quality gates |
 
-`tests/db/local-shim.sql` patches the plain Docker image to match hosted
-Supabase (newer storage/auth columns). It is never applied to a real project.
+The local stack is the official Supabase CLI (`supabase/config.toml`), so tests
+run against the same Postgres 17 / PostgREST / Auth / Storage as hosted
+Supabase. E2E tests read its URL and demo keys automatically and never touch a
+real project.
 
 ## Security model (summary)
 

@@ -14,7 +14,8 @@
     "test:all": "npm run test && npm run test:db && npm run test:e2e",
     "db:start": "bash scripts/db-local.sh start",
     "db:stop": "bash scripts/db-local.sh stop",
-    "db:reset": "bash scripts/db-local.sh reset"
+    "db:reset": "bash scripts/db-local.sh reset",
+    "db:env": "bash scripts/db-local.sh env"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -26,6 +27,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.1",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/turbopack": "4.3.3",
     "@testing-library/dom": "^10.4.2",
@@ -40,6 +42,7 @@
     "eslint-config-next": "16.4.6",
     "jsdom": "^31.0.1",
     "pg": "^8.23.1",
+    "supabase": "^2.122.1",
     "tailwindcss": "4.3.3",
     "typescript": "^5",
     "vitest": "^5.1.2"
