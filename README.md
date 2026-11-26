@@ -17,7 +17,10 @@ src/config/store.ts   brand, contact, delivery & upload defaults (ONE place)
 src/app/globals.css   design tokens (colours, fonts, radius) — re-brand here
 src/components/ui/    design-system primitives (Button, Badge, Price, Icon, states)
 src/components/layout header, mobile menu, footer, WhatsApp button
-src/lib/catalog/      catalogue queries (cached 60 s) + Zod row mappers
+src/lib/catalog/      catalogue queries (cached 60 s), Zod row mappers, URL filters,
+                      product/variant logic
+src/lib/stores/       browser cart + wishlist (Zod-validated localStorage)
+src/config/size-guide.ts  size charts (placeholder measurements — replace)
 src/lib/domain.ts     order/payment statuses + workflow (mirrors DB enums)
 src/lib/env.ts        Zod-validated environment variables
 src/lib/supabase/     browser, server (RLS) and service-role clients

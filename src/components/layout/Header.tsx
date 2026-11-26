@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
+import { CartLink, WishlistLink } from "./HeaderCounts";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 import type { NavLink } from "./nav";
@@ -71,12 +72,8 @@ export function Header({
           <Link href="/account" className={cn(iconLink, "hidden sm:inline-flex")} aria-label="Account">
             <Icon name="user" />
           </Link>
-          <Link href="/wishlist" className={cn(iconLink, "inline-flex")} aria-label="Wishlist">
-            <Icon name="heart" />
-          </Link>
-          <Link href="/cart" className={cn(iconLink, "-mr-2 inline-flex sm:mr-0")} aria-label="Shopping bag">
-            <Icon name="bag" />
-          </Link>
+          <WishlistLink className={cn(iconLink, "inline-flex")} />
+          <CartLink className={cn(iconLink, "-mr-2 inline-flex sm:mr-0")} />
         </div>
       </div>
     </header>

@@ -5,6 +5,7 @@ import type { ProductCardData } from "@/lib/catalog/mappers";
 import { cn } from "@/lib/cn";
 import { discountPercent } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
+import { WishlistButton } from "./WishlistButton";
 
 const MAX_SWATCHES = 4;
 
@@ -56,6 +57,12 @@ export function ProductCard({
             <Badge tone="new">New</Badge>
           ) : null}
         </div>
+
+        <WishlistButton
+          productId={product.id}
+          productName={product.name}
+          className="absolute top-2 right-2 z-10"
+        />
 
         {product.inStock && product.sizesInStock.length > 1 ? (
           <ul

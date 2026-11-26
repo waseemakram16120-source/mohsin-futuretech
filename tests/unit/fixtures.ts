@@ -49,3 +49,29 @@ export function productCard(overrides: Partial<ProductCardData> = {}): ProductCa
     ...overrides,
   };
 }
+
+const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
+
+/** Raw Supabase row for the product detail page. */
+export const detailRow = {
+  id: id(1),
+  slug: "mens-quilted-puffer-jacket",
+  name: "Men's Quilted Puffer Jacket",
+  audience: "men",
+  description: "Warm.",
+  details: ["Nylon shell"],
+  base_price: "7999.00",
+  compare_at_price: "9999.00",
+  is_new_arrival: true,
+  category: { name: "Jackets", slug: "jackets" },
+  product_images: [
+    { url: "/b.svg", alt: "", sort_order: 1 },
+    { url: "/a.svg", alt: "Front", sort_order: 0 },
+  ],
+  product_variants: [
+    { id: id(11), sku: "JKT-001-S-BLAC", size: "S", color: "Black", color_hex: "#1F1F1F", stock_quantity: 3, price_override: null, sort_order: 0 },
+    { id: id(12), sku: "JKT-001-M-BLAC", size: "M", color: "Black", color_hex: "#1F1F1F", stock_quantity: 0, price_override: null, sort_order: 1 },
+    { id: id(13), sku: "JKT-001-M-OLIV", size: "M", color: "Olive", color_hex: "#5B6236", stock_quantity: 12, price_override: "8499.00", sort_order: 100 },
+    { id: id(14), sku: "JKT-001-XL-OLIV", size: "XL", color: "Olive", color_hex: "#5B6236", stock_quantity: 0, price_override: null, sort_order: 101 },
+  ],
+};
