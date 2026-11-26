@@ -118,6 +118,7 @@ describe("place_order", () => {
            join public.products p on p.id = v.product_id
           where p.is_active and v.stock_quantity between 2 and 9 order by v.sku limit 1`,
       );
+      const before = await db.one<{ n: string }>("select count(*)::text as n from public.orders");
       await db.as("service_role");
       const err = await db.fails("select public.place_order(null, $1, $2, 'cod', null)", [
         { name: "Ali Khan", phone: "03001234567", address: "House 1, Street 2, Area", city: "Karachi" },
@@ -127,7 +128,8 @@ describe("place_order", () => {
       expect(JSON.parse(err.detail ?? "{}")).toEqual({ variant_id: v.id, available: v.stock_quantity });
 
       await db.asOwner();
-      expect(await db.rows("select id from public.orders")).toHaveLength(0);
+      const after = await db.one<{ n: string }>("select count(*)::text as n from public.orders");
+      expect(after.n).toBe(before.n);
       const unchanged = await db.one<{ stock_quantity: number }>(
         "select stock_quantity from public.product_variants where id = $1",
         [v.id],
@@ -185,6 +187,9 @@ describe("place_order", () => {
   it("applies a coupon, records the redemption and counts the use", async () => {
     await withTx(async (db) => {
       const v = await stocked(db, "mens-slim-fit-stretch-jeans", 1); // Rs 4,499
+      const { used_count: usedBefore } = await db.one<{ used_count: number }>(
+        "select used_count from public.coupons where code = 'WELCOME10'",
+      );
       const result = await db.placeOrder({
         items: [{ variant_id: v.id, quantity: 1 }],
         coupon: " welcome10 ",
@@ -199,7 +204,7 @@ describe("place_order", () => {
       const coupon = await db.one<{ used_count: number }>(
         "select used_count from public.coupons where code = 'WELCOME10'",
       );
-      expect(coupon.used_count).toBe(1);
+      expect(coupon.used_count).toBe(usedBefore + 1);
       expect(
         await db.rows("select id from public.coupon_redemptions where order_id = $1", [result.order_id]),
       ).toHaveLength(1);

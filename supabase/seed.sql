@@ -24,721 +24,721 @@ update public.store_settings set
 where id = 1;
 
 -- Categories
-insert into public.categories (name, slug, description, image_url, sort_order) values ('Jackets', 'jackets', 'Puffers, denim, suede and outerwear for every season.', '/placeholders/category-jackets.svg', 1) on conflict (slug) do nothing;
-insert into public.categories (name, slug, description, image_url, sort_order) values ('Jeans', 'jeans', 'Slim, straight and wide-leg denim in stretch and rigid fabrics.', '/placeholders/category-jeans.svg', 2) on conflict (slug) do nothing;
-insert into public.categories (name, slug, description, image_url, sort_order) values ('Shirts', 'shirts', 'Oxford, linen and printed shirts for work and weekends.', '/placeholders/category-shirts.svg', 3) on conflict (slug) do nothing;
-insert into public.categories (name, slug, description, image_url, sort_order) values ('Trousers', 'trousers', 'Chinos and tailored trousers with a clean finish.', '/placeholders/category-trousers.svg', 4) on conflict (slug) do nothing;
-insert into public.categories (name, slug, description, image_url, sort_order) values ('Accessories', 'accessories', 'Belts, caps and wallets to complete the look.', '/placeholders/category-accessories.svg', 5) on conflict (slug) do nothing;
+insert into public.categories (id, name, slug, description, image_url, sort_order) values (overlay(overlay(md5('category:jackets') placing '4' from 13) placing '8' from 17)::uuid, 'Jackets', 'jackets', 'Puffers, denim, suede and outerwear for every season.', '/placeholders/category-jackets.svg', 1) on conflict (slug) do nothing;
+insert into public.categories (id, name, slug, description, image_url, sort_order) values (overlay(overlay(md5('category:jeans') placing '4' from 13) placing '8' from 17)::uuid, 'Jeans', 'jeans', 'Slim, straight and wide-leg denim in stretch and rigid fabrics.', '/placeholders/category-jeans.svg', 2) on conflict (slug) do nothing;
+insert into public.categories (id, name, slug, description, image_url, sort_order) values (overlay(overlay(md5('category:shirts') placing '4' from 13) placing '8' from 17)::uuid, 'Shirts', 'shirts', 'Oxford, linen and printed shirts for work and weekends.', '/placeholders/category-shirts.svg', 3) on conflict (slug) do nothing;
+insert into public.categories (id, name, slug, description, image_url, sort_order) values (overlay(overlay(md5('category:trousers') placing '4' from 13) placing '8' from 17)::uuid, 'Trousers', 'trousers', 'Chinos and tailored trousers with a clean finish.', '/placeholders/category-trousers.svg', 4) on conflict (slug) do nothing;
+insert into public.categories (id, name, slug, description, image_url, sort_order) values (overlay(overlay(md5('category:accessories') placing '4' from 13) placing '8' from 17)::uuid, 'Accessories', 'accessories', 'Belts, caps and wallets to complete the look.', '/placeholders/category-accessories.svg', 5) on conflict (slug) do nothing;
 
 -- Men's Quilted Puffer Jacket
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Men''s Quilted Puffer Jacket', 'mens-quilted-puffer-jacket', 'A lightweight quilted puffer with a water-repellent shell and a warm synthetic fill — built for Pakistani winters without the bulk.', array['Water-repellent nylon shell', 'Synthetic down-alternative fill', 'Two zip hand pockets', 'Regular fit']::text[], 7999, 9999, true, true, true
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:mens-quilted-puffer-jacket') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Men''s Quilted Puffer Jacket', 'mens-quilted-puffer-jacket', 'A lightweight quilted puffer with a water-repellent shell and a warm synthetic fill — built for Pakistani winters without the bulk.', array['Water-repellent nylon shell', 'Synthetic down-alternative fill', 'Two zip hand pockets', 'Regular fit']::text[], 7999, 9999, true, true, true
 from public.categories where slug = 'jackets'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-quilted-puffer-jacket-1.svg', 'Men''s Quilted Puffer Jacket', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-quilted-puffer-jacket-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-quilted-puffer-jacket-1.svg', 'Men''s Quilted Puffer Jacket', 0
 from public.products where slug = 'mens-quilted-puffer-jacket'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-quilted-puffer-jacket' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-quilted-puffer-jacket-2.svg', 'Men''s Quilted Puffer Jacket — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-quilted-puffer-jacket-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-quilted-puffer-jacket-2.svg', 'Men''s Quilted Puffer Jacket — alternate view', 1
 from public.products where slug = 'mens-quilted-puffer-jacket'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-quilted-puffer-jacket' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-001-S-BLAC', 'S', 'Black', '#1F1F1F', 12, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-001-S-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-001-S-BLAC', 'S', 'Black', '#1F1F1F', 12, 0
 from public.products where slug = 'mens-quilted-puffer-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-001-M-BLAC', 'M', 'Black', '#1F1F1F', 8, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-001-M-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-001-M-BLAC', 'M', 'Black', '#1F1F1F', 8, 1
 from public.products where slug = 'mens-quilted-puffer-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-001-L-BLAC', 'L', 'Black', '#1F1F1F', 20, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-001-L-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-001-L-BLAC', 'L', 'Black', '#1F1F1F', 20, 2
 from public.products where slug = 'mens-quilted-puffer-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-001-XL-BLAC', 'XL', 'Black', '#1F1F1F', 3, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-001-XL-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-001-XL-BLAC', 'XL', 'Black', '#1F1F1F', 3, 3
 from public.products where slug = 'mens-quilted-puffer-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-001-S-OLIV', 'S', 'Olive', '#5B6236', 15, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-001-S-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-001-S-OLIV', 'S', 'Olive', '#5B6236', 15, 100
 from public.products where slug = 'mens-quilted-puffer-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-001-M-OLIV', 'M', 'Olive', '#5B6236', 0, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-001-M-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-001-M-OLIV', 'M', 'Olive', '#5B6236', 0, 101
 from public.products where slug = 'mens-quilted-puffer-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-001-L-OLIV', 'L', 'Olive', '#5B6236', 9, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-001-L-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-001-L-OLIV', 'L', 'Olive', '#5B6236', 9, 102
 from public.products where slug = 'mens-quilted-puffer-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-001-XL-OLIV', 'XL', 'Olive', '#5B6236', 25, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-001-XL-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-001-XL-OLIV', 'XL', 'Olive', '#5B6236', 25, 103
 from public.products where slug = 'mens-quilted-puffer-jacket'
 on conflict (sku) do nothing;
 
 -- Men's Suede Trucker Jacket
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Men''s Suede Trucker Jacket', 'mens-suede-trucker-jacket', 'A classic trucker silhouette in soft faux suede with button chest pockets and an easy, layered fit.', array['Faux suede outer', 'Satin lining', 'Button front and cuffs', 'Regular fit']::text[], 11999, null, true, true, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:mens-suede-trucker-jacket') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Men''s Suede Trucker Jacket', 'mens-suede-trucker-jacket', 'A classic trucker silhouette in soft faux suede with button chest pockets and an easy, layered fit.', array['Faux suede outer', 'Satin lining', 'Button front and cuffs', 'Regular fit']::text[], 11999, null, true, true, false
 from public.categories where slug = 'jackets'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-suede-trucker-jacket-1.svg', 'Men''s Suede Trucker Jacket', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-suede-trucker-jacket-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-suede-trucker-jacket-1.svg', 'Men''s Suede Trucker Jacket', 0
 from public.products where slug = 'mens-suede-trucker-jacket'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-suede-trucker-jacket' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-suede-trucker-jacket-2.svg', 'Men''s Suede Trucker Jacket — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-suede-trucker-jacket-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-suede-trucker-jacket-2.svg', 'Men''s Suede Trucker Jacket — alternate view', 1
 from public.products where slug = 'mens-suede-trucker-jacket'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-suede-trucker-jacket' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-002-S-TAN', 'S', 'Tan', '#B07A4A', 3, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-002-S-TAN') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-002-S-TAN', 'S', 'Tan', '#B07A4A', 3, 0
 from public.products where slug = 'mens-suede-trucker-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-002-M-TAN', 'M', 'Tan', '#B07A4A', 15, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-002-M-TAN') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-002-M-TAN', 'M', 'Tan', '#B07A4A', 15, 1
 from public.products where slug = 'mens-suede-trucker-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-002-L-TAN', 'L', 'Tan', '#B07A4A', 0, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-002-L-TAN') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-002-L-TAN', 'L', 'Tan', '#B07A4A', 0, 2
 from public.products where slug = 'mens-suede-trucker-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-002-XL-TAN', 'XL', 'Tan', '#B07A4A', 9, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-002-XL-TAN') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-002-XL-TAN', 'XL', 'Tan', '#B07A4A', 9, 3
 from public.products where slug = 'mens-suede-trucker-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-002-S-BROW', 'S', 'Brown', '#6B4226', 25, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-002-S-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-002-S-BROW', 'S', 'Brown', '#6B4226', 25, 100
 from public.products where slug = 'mens-suede-trucker-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-002-M-BROW', 'M', 'Brown', '#6B4226', 5, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-002-M-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-002-M-BROW', 'M', 'Brown', '#6B4226', 5, 101
 from public.products where slug = 'mens-suede-trucker-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-002-L-BROW', 'L', 'Brown', '#6B4226', 18, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-002-L-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-002-L-BROW', 'L', 'Brown', '#6B4226', 18, 102
 from public.products where slug = 'mens-suede-trucker-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-002-XL-BROW', 'XL', 'Brown', '#6B4226', 2, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-002-XL-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-002-XL-BROW', 'XL', 'Brown', '#6B4226', 2, 103
 from public.products where slug = 'mens-suede-trucker-jacket'
 on conflict (sku) do nothing;
 
 -- Women's Cropped Denim Jacket
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'women', 'Women''s Cropped Denim Jacket', 'womens-cropped-denim-jacket', 'A cropped denim jacket with a boxy shape that pairs with high-rise jeans and dresses alike.', array['100% cotton denim', 'Cropped boxy fit', 'Metal shank buttons']::text[], 6499, 7999, true, false, true
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:womens-cropped-denim-jacket') placing '4' from 13) placing '8' from 17)::uuid, id, 'women', 'Women''s Cropped Denim Jacket', 'womens-cropped-denim-jacket', 'A cropped denim jacket with a boxy shape that pairs with high-rise jeans and dresses alike.', array['100% cotton denim', 'Cropped boxy fit', 'Metal shank buttons']::text[], 6499, 7999, true, false, true
 from public.categories where slug = 'jackets'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-cropped-denim-jacket-1.svg', 'Women''s Cropped Denim Jacket', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-cropped-denim-jacket-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-cropped-denim-jacket-1.svg', 'Women''s Cropped Denim Jacket', 0
 from public.products where slug = 'womens-cropped-denim-jacket'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-cropped-denim-jacket' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-cropped-denim-jacket-2.svg', 'Women''s Cropped Denim Jacket — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-cropped-denim-jacket-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-cropped-denim-jacket-2.svg', 'Women''s Cropped Denim Jacket — alternate view', 1
 from public.products where slug = 'womens-cropped-denim-jacket'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-cropped-denim-jacket' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-003-S-LIGH', 'S', 'Light Blue', '#9DB7D5', 9, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-003-S-LIGH') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-003-S-LIGH', 'S', 'Light Blue', '#9DB7D5', 9, 0
 from public.products where slug = 'womens-cropped-denim-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-003-M-LIGH', 'M', 'Light Blue', '#9DB7D5', 25, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-003-M-LIGH') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-003-M-LIGH', 'M', 'Light Blue', '#9DB7D5', 25, 1
 from public.products where slug = 'womens-cropped-denim-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-003-L-LIGH', 'L', 'Light Blue', '#9DB7D5', 5, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-003-L-LIGH') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-003-L-LIGH', 'L', 'Light Blue', '#9DB7D5', 5, 2
 from public.products where slug = 'womens-cropped-denim-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-003-XL-LIGH', 'XL', 'Light Blue', '#9DB7D5', 18, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-003-XL-LIGH') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-003-XL-LIGH', 'XL', 'Light Blue', '#9DB7D5', 18, 3
 from public.products where slug = 'womens-cropped-denim-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-003-S-INDI', 'S', 'Indigo', '#2E3F6E', 2, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-003-S-INDI') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-003-S-INDI', 'S', 'Indigo', '#2E3F6E', 2, 100
 from public.products where slug = 'womens-cropped-denim-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-003-M-INDI', 'M', 'Indigo', '#2E3F6E', 30, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-003-M-INDI') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-003-M-INDI', 'M', 'Indigo', '#2E3F6E', 30, 101
 from public.products where slug = 'womens-cropped-denim-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-003-L-INDI', 'L', 'Indigo', '#2E3F6E', 12, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-003-L-INDI') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-003-L-INDI', 'L', 'Indigo', '#2E3F6E', 12, 102
 from public.products where slug = 'womens-cropped-denim-jacket'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-003-XL-INDI', 'XL', 'Indigo', '#2E3F6E', 8, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-003-XL-INDI') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-003-XL-INDI', 'XL', 'Indigo', '#2E3F6E', 8, 103
 from public.products where slug = 'womens-cropped-denim-jacket'
 on conflict (sku) do nothing;
 
 -- Women's Belted Trench Coat
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'women', 'Women''s Belted Trench Coat', 'womens-belted-trench-coat', 'A double-breasted trench with a removable belt, storm flap and a fluid drape.', array['Cotton-blend gabardine', 'Removable waist belt', 'Double-breasted front', 'Relaxed fit']::text[], 12999, null, true, true, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:womens-belted-trench-coat') placing '4' from 13) placing '8' from 17)::uuid, id, 'women', 'Women''s Belted Trench Coat', 'womens-belted-trench-coat', 'A double-breasted trench with a removable belt, storm flap and a fluid drape.', array['Cotton-blend gabardine', 'Removable waist belt', 'Double-breasted front', 'Relaxed fit']::text[], 12999, null, true, true, false
 from public.categories where slug = 'jackets'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-belted-trench-coat-1.svg', 'Women''s Belted Trench Coat', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-belted-trench-coat-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-belted-trench-coat-1.svg', 'Women''s Belted Trench Coat', 0
 from public.products where slug = 'womens-belted-trench-coat'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-belted-trench-coat' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-belted-trench-coat-2.svg', 'Women''s Belted Trench Coat — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-belted-trench-coat-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-belted-trench-coat-2.svg', 'Women''s Belted Trench Coat — alternate view', 1
 from public.products where slug = 'womens-belted-trench-coat'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-belted-trench-coat' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-004-S-BEIG', 'S', 'Beige', '#D8C8AE', 18, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-004-S-BEIG') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-004-S-BEIG', 'S', 'Beige', '#D8C8AE', 18, 0
 from public.products where slug = 'womens-belted-trench-coat'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-004-M-BEIG', 'M', 'Beige', '#D8C8AE', 2, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-004-M-BEIG') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-004-M-BEIG', 'M', 'Beige', '#D8C8AE', 2, 1
 from public.products where slug = 'womens-belted-trench-coat'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-004-L-BEIG', 'L', 'Beige', '#D8C8AE', 30, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-004-L-BEIG') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-004-L-BEIG', 'L', 'Beige', '#D8C8AE', 30, 2
 from public.products where slug = 'womens-belted-trench-coat'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-004-XL-BEIG', 'XL', 'Beige', '#D8C8AE', 12, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-004-XL-BEIG') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-004-XL-BEIG', 'XL', 'Beige', '#D8C8AE', 12, 3
 from public.products where slug = 'womens-belted-trench-coat'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-004-S-BLAC', 'S', 'Black', '#1F1F1F', 8, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-004-S-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-004-S-BLAC', 'S', 'Black', '#1F1F1F', 8, 100
 from public.products where slug = 'womens-belted-trench-coat'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-004-M-BLAC', 'M', 'Black', '#1F1F1F', 20, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-004-M-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-004-M-BLAC', 'M', 'Black', '#1F1F1F', 20, 101
 from public.products where slug = 'womens-belted-trench-coat'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-004-L-BLAC', 'L', 'Black', '#1F1F1F', 3, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-004-L-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-004-L-BLAC', 'L', 'Black', '#1F1F1F', 3, 102
 from public.products where slug = 'womens-belted-trench-coat'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-004-XL-BLAC', 'XL', 'Black', '#1F1F1F', 15, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-004-XL-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-004-XL-BLAC', 'XL', 'Black', '#1F1F1F', 15, 103
 from public.products where slug = 'womens-belted-trench-coat'
 on conflict (sku) do nothing;
 
 -- Men's Slim Fit Stretch Jeans
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Men''s Slim Fit Stretch Jeans', 'mens-slim-fit-stretch-jeans', 'Slim through the hip and thigh with a tapered leg and just enough stretch for all-day comfort.', array['98% cotton, 2% elastane', 'Slim tapered fit', 'Five-pocket styling']::text[], 4499, null, true, true, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:mens-slim-fit-stretch-jeans') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Men''s Slim Fit Stretch Jeans', 'mens-slim-fit-stretch-jeans', 'Slim through the hip and thigh with a tapered leg and just enough stretch for all-day comfort.', array['98% cotton, 2% elastane', 'Slim tapered fit', 'Five-pocket styling']::text[], 4499, null, true, true, false
 from public.categories where slug = 'jeans'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-slim-fit-stretch-jeans-1.svg', 'Men''s Slim Fit Stretch Jeans', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-slim-fit-stretch-jeans-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-slim-fit-stretch-jeans-1.svg', 'Men''s Slim Fit Stretch Jeans', 0
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-slim-fit-stretch-jeans' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-slim-fit-stretch-jeans-2.svg', 'Men''s Slim Fit Stretch Jeans — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-slim-fit-stretch-jeans-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-slim-fit-stretch-jeans-2.svg', 'Men''s Slim Fit Stretch Jeans — alternate view', 1
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-slim-fit-stretch-jeans' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-005-30-INDI', '30', 'Indigo', '#2E3F6E', 12, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-005-30-INDI') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-005-30-INDI', '30', 'Indigo', '#2E3F6E', 12, 0
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-005-32-INDI', '32', 'Indigo', '#2E3F6E', 8, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-005-32-INDI') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-005-32-INDI', '32', 'Indigo', '#2E3F6E', 8, 1
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-005-34-INDI', '34', 'Indigo', '#2E3F6E', 20, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-005-34-INDI') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-005-34-INDI', '34', 'Indigo', '#2E3F6E', 20, 2
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-005-36-INDI', '36', 'Indigo', '#2E3F6E', 3, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-005-36-INDI') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-005-36-INDI', '36', 'Indigo', '#2E3F6E', 3, 3
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-005-30-BLAC', '30', 'Black', '#1F1F1F', 15, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-005-30-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-005-30-BLAC', '30', 'Black', '#1F1F1F', 15, 100
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-005-32-BLAC', '32', 'Black', '#1F1F1F', 0, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-005-32-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-005-32-BLAC', '32', 'Black', '#1F1F1F', 0, 101
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-005-34-BLAC', '34', 'Black', '#1F1F1F', 9, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-005-34-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-005-34-BLAC', '34', 'Black', '#1F1F1F', 9, 102
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-005-36-BLAC', '36', 'Black', '#1F1F1F', 25, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-005-36-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-005-36-BLAC', '36', 'Black', '#1F1F1F', 25, 103
 from public.products where slug = 'mens-slim-fit-stretch-jeans'
 on conflict (sku) do nothing;
 
 -- Men's Relaxed Straight Jeans
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Men''s Relaxed Straight Jeans', 'mens-relaxed-straight-jeans', 'An easy straight leg with room through the seat, washed for a soft, worn-in hand feel.', array['100% cotton denim', 'Relaxed straight fit', 'Stone wash']::text[], 3999, 4999, true, false, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:mens-relaxed-straight-jeans') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Men''s Relaxed Straight Jeans', 'mens-relaxed-straight-jeans', 'An easy straight leg with room through the seat, washed for a soft, worn-in hand feel.', array['100% cotton denim', 'Relaxed straight fit', 'Stone wash']::text[], 3999, 4999, true, false, false
 from public.categories where slug = 'jeans'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-relaxed-straight-jeans-1.svg', 'Men''s Relaxed Straight Jeans', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-relaxed-straight-jeans-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-relaxed-straight-jeans-1.svg', 'Men''s Relaxed Straight Jeans', 0
 from public.products where slug = 'mens-relaxed-straight-jeans'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-relaxed-straight-jeans' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-relaxed-straight-jeans-2.svg', 'Men''s Relaxed Straight Jeans — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-relaxed-straight-jeans-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-relaxed-straight-jeans-2.svg', 'Men''s Relaxed Straight Jeans — alternate view', 1
 from public.products where slug = 'mens-relaxed-straight-jeans'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-relaxed-straight-jeans' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-006-30-MIDB', '30', 'Mid Blue', '#5A7BA8', 3, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-006-30-MIDB') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-006-30-MIDB', '30', 'Mid Blue', '#5A7BA8', 3, 0
 from public.products where slug = 'mens-relaxed-straight-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-006-32-MIDB', '32', 'Mid Blue', '#5A7BA8', 15, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-006-32-MIDB') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-006-32-MIDB', '32', 'Mid Blue', '#5A7BA8', 15, 1
 from public.products where slug = 'mens-relaxed-straight-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-006-34-MIDB', '34', 'Mid Blue', '#5A7BA8', 0, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-006-34-MIDB') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-006-34-MIDB', '34', 'Mid Blue', '#5A7BA8', 0, 2
 from public.products where slug = 'mens-relaxed-straight-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-006-36-MIDB', '36', 'Mid Blue', '#5A7BA8', 9, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-006-36-MIDB') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-006-36-MIDB', '36', 'Mid Blue', '#5A7BA8', 9, 3
 from public.products where slug = 'mens-relaxed-straight-jeans'
 on conflict (sku) do nothing;
 
 -- Women's High-Rise Skinny Jeans
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'women', 'Women''s High-Rise Skinny Jeans', 'womens-high-rise-skinny-jeans', 'A sculpting high rise and a skinny leg in recovery stretch denim that keeps its shape.', array['High rise', 'Skinny fit', 'Recovery stretch denim']::text[], 3999, null, true, false, true
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:womens-high-rise-skinny-jeans') placing '4' from 13) placing '8' from 17)::uuid, id, 'women', 'Women''s High-Rise Skinny Jeans', 'womens-high-rise-skinny-jeans', 'A sculpting high rise and a skinny leg in recovery stretch denim that keeps its shape.', array['High rise', 'Skinny fit', 'Recovery stretch denim']::text[], 3999, null, true, false, true
 from public.categories where slug = 'jeans'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-high-rise-skinny-jeans-1.svg', 'Women''s High-Rise Skinny Jeans', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-high-rise-skinny-jeans-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-high-rise-skinny-jeans-1.svg', 'Women''s High-Rise Skinny Jeans', 0
 from public.products where slug = 'womens-high-rise-skinny-jeans'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-high-rise-skinny-jeans' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-high-rise-skinny-jeans-2.svg', 'Women''s High-Rise Skinny Jeans — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-high-rise-skinny-jeans-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-high-rise-skinny-jeans-2.svg', 'Women''s High-Rise Skinny Jeans — alternate view', 1
 from public.products where slug = 'womens-high-rise-skinny-jeans'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-high-rise-skinny-jeans' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-007-26-DARK', '26', 'Dark Blue', '#22324F', 9, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-007-26-DARK') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-007-26-DARK', '26', 'Dark Blue', '#22324F', 9, 0
 from public.products where slug = 'womens-high-rise-skinny-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-007-28-DARK', '28', 'Dark Blue', '#22324F', 25, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-007-28-DARK') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-007-28-DARK', '28', 'Dark Blue', '#22324F', 25, 1
 from public.products where slug = 'womens-high-rise-skinny-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-007-30-DARK', '30', 'Dark Blue', '#22324F', 5, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-007-30-DARK') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-007-30-DARK', '30', 'Dark Blue', '#22324F', 5, 2
 from public.products where slug = 'womens-high-rise-skinny-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-007-32-DARK', '32', 'Dark Blue', '#22324F', 18, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-007-32-DARK') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-007-32-DARK', '32', 'Dark Blue', '#22324F', 18, 3
 from public.products where slug = 'womens-high-rise-skinny-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-007-26-BLAC', '26', 'Black', '#1F1F1F', 2, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-007-26-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-007-26-BLAC', '26', 'Black', '#1F1F1F', 2, 100
 from public.products where slug = 'womens-high-rise-skinny-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-007-28-BLAC', '28', 'Black', '#1F1F1F', 30, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-007-28-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-007-28-BLAC', '28', 'Black', '#1F1F1F', 30, 101
 from public.products where slug = 'womens-high-rise-skinny-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-007-30-BLAC', '30', 'Black', '#1F1F1F', 12, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-007-30-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-007-30-BLAC', '30', 'Black', '#1F1F1F', 12, 102
 from public.products where slug = 'womens-high-rise-skinny-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-007-32-BLAC', '32', 'Black', '#1F1F1F', 8, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-007-32-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-007-32-BLAC', '32', 'Black', '#1F1F1F', 8, 103
 from public.products where slug = 'womens-high-rise-skinny-jeans'
 on conflict (sku) do nothing;
 
 -- Women's Wide-Leg Jeans
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'women', 'Women''s Wide-Leg Jeans', 'womens-wide-leg-jeans', 'A fluid wide leg with a high waist and a full-length hem, cut from soft rigid denim.', array['High waist', 'Wide leg', '100% cotton']::text[], 4299, null, true, false, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:womens-wide-leg-jeans') placing '4' from 13) placing '8' from 17)::uuid, id, 'women', 'Women''s Wide-Leg Jeans', 'womens-wide-leg-jeans', 'A fluid wide leg with a high waist and a full-length hem, cut from soft rigid denim.', array['High waist', 'Wide leg', '100% cotton']::text[], 4299, null, true, false, false
 from public.categories where slug = 'jeans'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-wide-leg-jeans-1.svg', 'Women''s Wide-Leg Jeans', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-wide-leg-jeans-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-wide-leg-jeans-1.svg', 'Women''s Wide-Leg Jeans', 0
 from public.products where slug = 'womens-wide-leg-jeans'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-wide-leg-jeans' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-wide-leg-jeans-2.svg', 'Women''s Wide-Leg Jeans — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-wide-leg-jeans-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-wide-leg-jeans-2.svg', 'Women''s Wide-Leg Jeans — alternate view', 1
 from public.products where slug = 'womens-wide-leg-jeans'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-wide-leg-jeans' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-008-26-LIGH', '26', 'Light Blue', '#9DB7D5', 18, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-008-26-LIGH') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-008-26-LIGH', '26', 'Light Blue', '#9DB7D5', 18, 0
 from public.products where slug = 'womens-wide-leg-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-008-28-LIGH', '28', 'Light Blue', '#9DB7D5', 2, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-008-28-LIGH') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-008-28-LIGH', '28', 'Light Blue', '#9DB7D5', 2, 1
 from public.products where slug = 'womens-wide-leg-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-008-30-LIGH', '30', 'Light Blue', '#9DB7D5', 30, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-008-30-LIGH') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-008-30-LIGH', '30', 'Light Blue', '#9DB7D5', 30, 2
 from public.products where slug = 'womens-wide-leg-jeans'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JNS-008-32-LIGH', '32', 'Light Blue', '#9DB7D5', 12, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JNS-008-32-LIGH') placing '4' from 13) placing '8' from 17)::uuid, id, 'JNS-008-32-LIGH', '32', 'Light Blue', '#9DB7D5', 12, 3
 from public.products where slug = 'womens-wide-leg-jeans'
 on conflict (sku) do nothing;
 
 -- Men's Oxford Button-Down Shirt
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Men''s Oxford Button-Down Shirt', 'mens-oxford-button-down-shirt', 'A wardrobe staple in breathable oxford cotton with a button-down collar.', array['100% cotton oxford', 'Button-down collar', 'Regular fit']::text[], 2999, null, true, true, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:mens-oxford-button-down-shirt') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Men''s Oxford Button-Down Shirt', 'mens-oxford-button-down-shirt', 'A wardrobe staple in breathable oxford cotton with a button-down collar.', array['100% cotton oxford', 'Button-down collar', 'Regular fit']::text[], 2999, null, true, true, false
 from public.categories where slug = 'shirts'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-oxford-button-down-shirt-1.svg', 'Men''s Oxford Button-Down Shirt', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-oxford-button-down-shirt-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-oxford-button-down-shirt-1.svg', 'Men''s Oxford Button-Down Shirt', 0
 from public.products where slug = 'mens-oxford-button-down-shirt'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-oxford-button-down-shirt' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-oxford-button-down-shirt-2.svg', 'Men''s Oxford Button-Down Shirt — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-oxford-button-down-shirt-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-oxford-button-down-shirt-2.svg', 'Men''s Oxford Button-Down Shirt — alternate view', 1
 from public.products where slug = 'mens-oxford-button-down-shirt'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-oxford-button-down-shirt' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-009-S-WHIT', 'S', 'White', '#F4F4F2', 12, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-009-S-WHIT') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-009-S-WHIT', 'S', 'White', '#F4F4F2', 12, 0
 from public.products where slug = 'mens-oxford-button-down-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-009-M-WHIT', 'M', 'White', '#F4F4F2', 8, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-009-M-WHIT') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-009-M-WHIT', 'M', 'White', '#F4F4F2', 8, 1
 from public.products where slug = 'mens-oxford-button-down-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-009-L-WHIT', 'L', 'White', '#F4F4F2', 20, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-009-L-WHIT') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-009-L-WHIT', 'L', 'White', '#F4F4F2', 20, 2
 from public.products where slug = 'mens-oxford-button-down-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-009-XL-WHIT', 'XL', 'White', '#F4F4F2', 3, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-009-XL-WHIT') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-009-XL-WHIT', 'XL', 'White', '#F4F4F2', 3, 3
 from public.products where slug = 'mens-oxford-button-down-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-009-S-SKYB', 'S', 'Sky Blue', '#A9C8E8', 15, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-009-S-SKYB') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-009-S-SKYB', 'S', 'Sky Blue', '#A9C8E8', 15, 100
 from public.products where slug = 'mens-oxford-button-down-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-009-M-SKYB', 'M', 'Sky Blue', '#A9C8E8', 0, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-009-M-SKYB') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-009-M-SKYB', 'M', 'Sky Blue', '#A9C8E8', 0, 101
 from public.products where slug = 'mens-oxford-button-down-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-009-L-SKYB', 'L', 'Sky Blue', '#A9C8E8', 9, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-009-L-SKYB') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-009-L-SKYB', 'L', 'Sky Blue', '#A9C8E8', 9, 102
 from public.products where slug = 'mens-oxford-button-down-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-009-XL-SKYB', 'XL', 'Sky Blue', '#A9C8E8', 25, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-009-XL-SKYB') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-009-XL-SKYB', 'XL', 'Sky Blue', '#A9C8E8', 25, 103
 from public.products where slug = 'mens-oxford-button-down-shirt'
 on conflict (sku) do nothing;
 
 -- Men's Linen Blend Shirt
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Men''s Linen Blend Shirt', 'mens-linen-blend-shirt', 'A breezy linen-cotton shirt made for hot afternoons, with a relaxed camp collar.', array['55% linen, 45% cotton', 'Camp collar', 'Relaxed fit']::text[], 3499, 4299, true, false, true
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:mens-linen-blend-shirt') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Men''s Linen Blend Shirt', 'mens-linen-blend-shirt', 'A breezy linen-cotton shirt made for hot afternoons, with a relaxed camp collar.', array['55% linen, 45% cotton', 'Camp collar', 'Relaxed fit']::text[], 3499, 4299, true, false, true
 from public.categories where slug = 'shirts'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-linen-blend-shirt-1.svg', 'Men''s Linen Blend Shirt', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-linen-blend-shirt-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-linen-blend-shirt-1.svg', 'Men''s Linen Blend Shirt', 0
 from public.products where slug = 'mens-linen-blend-shirt'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-linen-blend-shirt' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-linen-blend-shirt-2.svg', 'Men''s Linen Blend Shirt — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-linen-blend-shirt-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-linen-blend-shirt-2.svg', 'Men''s Linen Blend Shirt — alternate view', 1
 from public.products where slug = 'mens-linen-blend-shirt'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-linen-blend-shirt' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-010-S-SAND', 'S', 'Sand', '#CDB894', 3, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-010-S-SAND') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-010-S-SAND', 'S', 'Sand', '#CDB894', 3, 0
 from public.products where slug = 'mens-linen-blend-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-010-M-SAND', 'M', 'Sand', '#CDB894', 15, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-010-M-SAND') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-010-M-SAND', 'M', 'Sand', '#CDB894', 15, 1
 from public.products where slug = 'mens-linen-blend-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-010-L-SAND', 'L', 'Sand', '#CDB894', 0, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-010-L-SAND') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-010-L-SAND', 'L', 'Sand', '#CDB894', 0, 2
 from public.products where slug = 'mens-linen-blend-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-010-XL-SAND', 'XL', 'Sand', '#CDB894', 9, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-010-XL-SAND') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-010-XL-SAND', 'XL', 'Sand', '#CDB894', 9, 3
 from public.products where slug = 'mens-linen-blend-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-010-S-OLIV', 'S', 'Olive', '#5B6236', 25, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-010-S-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-010-S-OLIV', 'S', 'Olive', '#5B6236', 25, 100
 from public.products where slug = 'mens-linen-blend-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-010-M-OLIV', 'M', 'Olive', '#5B6236', 5, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-010-M-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-010-M-OLIV', 'M', 'Olive', '#5B6236', 5, 101
 from public.products where slug = 'mens-linen-blend-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-010-L-OLIV', 'L', 'Olive', '#5B6236', 18, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-010-L-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-010-L-OLIV', 'L', 'Olive', '#5B6236', 18, 102
 from public.products where slug = 'mens-linen-blend-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-010-XL-OLIV', 'XL', 'Olive', '#5B6236', 2, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-010-XL-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-010-XL-OLIV', 'XL', 'Olive', '#5B6236', 2, 103
 from public.products where slug = 'mens-linen-blend-shirt'
 on conflict (sku) do nothing;
 
 -- Women's Satin Blouse
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'women', 'Women''s Satin Blouse', 'womens-satin-blouse', 'A softly draped satin blouse with a concealed placket for a clean, polished finish.', array['Satin weave', 'Concealed button placket', 'Relaxed fit']::text[], 3299, null, true, false, true
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:womens-satin-blouse') placing '4' from 13) placing '8' from 17)::uuid, id, 'women', 'Women''s Satin Blouse', 'womens-satin-blouse', 'A softly draped satin blouse with a concealed placket for a clean, polished finish.', array['Satin weave', 'Concealed button placket', 'Relaxed fit']::text[], 3299, null, true, false, true
 from public.categories where slug = 'shirts'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-satin-blouse-1.svg', 'Women''s Satin Blouse', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-satin-blouse-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-satin-blouse-1.svg', 'Women''s Satin Blouse', 0
 from public.products where slug = 'womens-satin-blouse'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-satin-blouse' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-satin-blouse-2.svg', 'Women''s Satin Blouse — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-satin-blouse-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-satin-blouse-2.svg', 'Women''s Satin Blouse — alternate view', 1
 from public.products where slug = 'womens-satin-blouse'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-satin-blouse' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-011-S-IVOR', 'S', 'Ivory', '#EFE8D8', 9, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-011-S-IVOR') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-011-S-IVOR', 'S', 'Ivory', '#EFE8D8', 9, 0
 from public.products where slug = 'womens-satin-blouse'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-011-M-IVOR', 'M', 'Ivory', '#EFE8D8', 25, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-011-M-IVOR') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-011-M-IVOR', 'M', 'Ivory', '#EFE8D8', 25, 1
 from public.products where slug = 'womens-satin-blouse'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-011-L-IVOR', 'L', 'Ivory', '#EFE8D8', 5, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-011-L-IVOR') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-011-L-IVOR', 'L', 'Ivory', '#EFE8D8', 5, 2
 from public.products where slug = 'womens-satin-blouse'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-011-XL-IVOR', 'XL', 'Ivory', '#EFE8D8', 18, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-011-XL-IVOR') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-011-XL-IVOR', 'XL', 'Ivory', '#EFE8D8', 18, 3
 from public.products where slug = 'womens-satin-blouse'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-011-S-BLAC', 'S', 'Black', '#1F1F1F', 2, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-011-S-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-011-S-BLAC', 'S', 'Black', '#1F1F1F', 2, 100
 from public.products where slug = 'womens-satin-blouse'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-011-M-BLAC', 'M', 'Black', '#1F1F1F', 30, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-011-M-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-011-M-BLAC', 'M', 'Black', '#1F1F1F', 30, 101
 from public.products where slug = 'womens-satin-blouse'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-011-L-BLAC', 'L', 'Black', '#1F1F1F', 12, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-011-L-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-011-L-BLAC', 'L', 'Black', '#1F1F1F', 12, 102
 from public.products where slug = 'womens-satin-blouse'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-011-XL-BLAC', 'XL', 'Black', '#1F1F1F', 8, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-011-XL-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-011-XL-BLAC', 'XL', 'Black', '#1F1F1F', 8, 103
 from public.products where slug = 'womens-satin-blouse'
 on conflict (sku) do nothing;
 
 -- Women's Striped Cotton Shirt
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'women', 'Women''s Striped Cotton Shirt', 'womens-striped-cotton-shirt', 'A crisp striped shirt with an oversized fit and dropped shoulders.', array['100% cotton poplin', 'Oversized fit', 'Curved hem']::text[], 2799, 3499, true, false, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:womens-striped-cotton-shirt') placing '4' from 13) placing '8' from 17)::uuid, id, 'women', 'Women''s Striped Cotton Shirt', 'womens-striped-cotton-shirt', 'A crisp striped shirt with an oversized fit and dropped shoulders.', array['100% cotton poplin', 'Oversized fit', 'Curved hem']::text[], 2799, 3499, true, false, false
 from public.categories where slug = 'shirts'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-striped-cotton-shirt-1.svg', 'Women''s Striped Cotton Shirt', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-striped-cotton-shirt-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-striped-cotton-shirt-1.svg', 'Women''s Striped Cotton Shirt', 0
 from public.products where slug = 'womens-striped-cotton-shirt'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-striped-cotton-shirt' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-striped-cotton-shirt-2.svg', 'Women''s Striped Cotton Shirt — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-striped-cotton-shirt-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-striped-cotton-shirt-2.svg', 'Women''s Striped Cotton Shirt — alternate view', 1
 from public.products where slug = 'womens-striped-cotton-shirt'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-striped-cotton-shirt' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-012-S-BLUE', 'S', 'Blue Stripe', '#6F8FBF', 18, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-012-S-BLUE') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-012-S-BLUE', 'S', 'Blue Stripe', '#6F8FBF', 18, 0
 from public.products where slug = 'womens-striped-cotton-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-012-M-BLUE', 'M', 'Blue Stripe', '#6F8FBF', 2, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-012-M-BLUE') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-012-M-BLUE', 'M', 'Blue Stripe', '#6F8FBF', 2, 1
 from public.products where slug = 'womens-striped-cotton-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-012-L-BLUE', 'L', 'Blue Stripe', '#6F8FBF', 30, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-012-L-BLUE') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-012-L-BLUE', 'L', 'Blue Stripe', '#6F8FBF', 30, 2
 from public.products where slug = 'womens-striped-cotton-shirt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'SHT-012-XL-BLUE', 'XL', 'Blue Stripe', '#6F8FBF', 12, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:SHT-012-XL-BLUE') placing '4' from 13) placing '8' from 17)::uuid, id, 'SHT-012-XL-BLUE', 'XL', 'Blue Stripe', '#6F8FBF', 12, 3
 from public.products where slug = 'womens-striped-cotton-shirt'
 on conflict (sku) do nothing;
 
 -- Men's Chino Trousers
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Men''s Chino Trousers', 'mens-chino-trousers', 'Smart-casual chinos with a slim leg and a soft brushed finish.', array['Cotton twill with stretch', 'Slim fit', 'Slanted side pockets']::text[], 3299, null, true, false, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:mens-chino-trousers') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Men''s Chino Trousers', 'mens-chino-trousers', 'Smart-casual chinos with a slim leg and a soft brushed finish.', array['Cotton twill with stretch', 'Slim fit', 'Slanted side pockets']::text[], 3299, null, true, false, false
 from public.categories where slug = 'trousers'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-chino-trousers-1.svg', 'Men''s Chino Trousers', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-chino-trousers-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-chino-trousers-1.svg', 'Men''s Chino Trousers', 0
 from public.products where slug = 'mens-chino-trousers'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-chino-trousers' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/mens-chino-trousers-2.svg', 'Men''s Chino Trousers — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:mens-chino-trousers-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/mens-chino-trousers-2.svg', 'Men''s Chino Trousers — alternate view', 1
 from public.products where slug = 'mens-chino-trousers'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'mens-chino-trousers' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-013-30-KHAK', '30', 'Khaki', '#B9A57A', 12, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-013-30-KHAK') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-013-30-KHAK', '30', 'Khaki', '#B9A57A', 12, 0
 from public.products where slug = 'mens-chino-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-013-32-KHAK', '32', 'Khaki', '#B9A57A', 8, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-013-32-KHAK') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-013-32-KHAK', '32', 'Khaki', '#B9A57A', 8, 1
 from public.products where slug = 'mens-chino-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-013-34-KHAK', '34', 'Khaki', '#B9A57A', 20, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-013-34-KHAK') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-013-34-KHAK', '34', 'Khaki', '#B9A57A', 20, 2
 from public.products where slug = 'mens-chino-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-013-36-KHAK', '36', 'Khaki', '#B9A57A', 3, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-013-36-KHAK') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-013-36-KHAK', '36', 'Khaki', '#B9A57A', 3, 3
 from public.products where slug = 'mens-chino-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-013-30-NAVY', '30', 'Navy', '#1E2A44', 15, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-013-30-NAVY') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-013-30-NAVY', '30', 'Navy', '#1E2A44', 15, 100
 from public.products where slug = 'mens-chino-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-013-32-NAVY', '32', 'Navy', '#1E2A44', 0, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-013-32-NAVY') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-013-32-NAVY', '32', 'Navy', '#1E2A44', 0, 101
 from public.products where slug = 'mens-chino-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-013-34-NAVY', '34', 'Navy', '#1E2A44', 9, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-013-34-NAVY') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-013-34-NAVY', '34', 'Navy', '#1E2A44', 9, 102
 from public.products where slug = 'mens-chino-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-013-36-NAVY', '36', 'Navy', '#1E2A44', 25, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-013-36-NAVY') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-013-36-NAVY', '36', 'Navy', '#1E2A44', 25, 103
 from public.products where slug = 'mens-chino-trousers'
 on conflict (sku) do nothing;
 
 -- Women's Pleated Wide Trousers
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'women', 'Women''s Pleated Wide Trousers', 'womens-pleated-wide-trousers', 'High-waisted pleated trousers with a wide leg that moves beautifully.', array['Front pleats', 'High waist', 'Wide leg']::text[], 3799, null, true, true, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:womens-pleated-wide-trousers') placing '4' from 13) placing '8' from 17)::uuid, id, 'women', 'Women''s Pleated Wide Trousers', 'womens-pleated-wide-trousers', 'High-waisted pleated trousers with a wide leg that moves beautifully.', array['Front pleats', 'High waist', 'Wide leg']::text[], 3799, null, true, true, false
 from public.categories where slug = 'trousers'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-pleated-wide-trousers-1.svg', 'Women''s Pleated Wide Trousers', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-pleated-wide-trousers-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-pleated-wide-trousers-1.svg', 'Women''s Pleated Wide Trousers', 0
 from public.products where slug = 'womens-pleated-wide-trousers'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-pleated-wide-trousers' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/womens-pleated-wide-trousers-2.svg', 'Women''s Pleated Wide Trousers — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:womens-pleated-wide-trousers-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/womens-pleated-wide-trousers-2.svg', 'Women''s Pleated Wide Trousers — alternate view', 1
 from public.products where slug = 'womens-pleated-wide-trousers'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'womens-pleated-wide-trousers' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-014-26-BLAC', '26', 'Black', '#1F1F1F', 3, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-014-26-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-014-26-BLAC', '26', 'Black', '#1F1F1F', 3, 0
 from public.products where slug = 'womens-pleated-wide-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-014-28-BLAC', '28', 'Black', '#1F1F1F', 15, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-014-28-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-014-28-BLAC', '28', 'Black', '#1F1F1F', 15, 1
 from public.products where slug = 'womens-pleated-wide-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-014-30-BLAC', '30', 'Black', '#1F1F1F', 0, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-014-30-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-014-30-BLAC', '30', 'Black', '#1F1F1F', 0, 2
 from public.products where slug = 'womens-pleated-wide-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-014-32-BLAC', '32', 'Black', '#1F1F1F', 9, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-014-32-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-014-32-BLAC', '32', 'Black', '#1F1F1F', 9, 3
 from public.products where slug = 'womens-pleated-wide-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-014-26-CREA', '26', 'Cream', '#EDE3CC', 25, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-014-26-CREA') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-014-26-CREA', '26', 'Cream', '#EDE3CC', 25, 100
 from public.products where slug = 'womens-pleated-wide-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-014-28-CREA', '28', 'Cream', '#EDE3CC', 5, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-014-28-CREA') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-014-28-CREA', '28', 'Cream', '#EDE3CC', 5, 101
 from public.products where slug = 'womens-pleated-wide-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-014-30-CREA', '30', 'Cream', '#EDE3CC', 18, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-014-30-CREA') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-014-30-CREA', '30', 'Cream', '#EDE3CC', 18, 102
 from public.products where slug = 'womens-pleated-wide-trousers'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'TRS-014-32-CREA', '32', 'Cream', '#EDE3CC', 2, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:TRS-014-32-CREA') placing '4' from 13) placing '8' from 17)::uuid, id, 'TRS-014-32-CREA', '32', 'Cream', '#EDE3CC', 2, 103
 from public.products where slug = 'womens-pleated-wide-trousers'
 on conflict (sku) do nothing;
 
 -- Leather Belt
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'unisex', 'Leather Belt', 'leather-belt', 'A full-grain leather belt with a brushed metal buckle.', array['Full-grain leather', 'Brushed metal buckle', '3.5 cm width']::text[], 1999, null, true, false, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:leather-belt') placing '4' from 13) placing '8' from 17)::uuid, id, 'unisex', 'Leather Belt', 'leather-belt', 'A full-grain leather belt with a brushed metal buckle.', array['Full-grain leather', 'Brushed metal buckle', '3.5 cm width']::text[], 1999, null, true, false, false
 from public.categories where slug = 'accessories'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/leather-belt-1.svg', 'Leather Belt', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:leather-belt-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/leather-belt-1.svg', 'Leather Belt', 0
 from public.products where slug = 'leather-belt'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'leather-belt' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/leather-belt-2.svg', 'Leather Belt — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:leather-belt-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/leather-belt-2.svg', 'Leather Belt — alternate view', 1
 from public.products where slug = 'leather-belt'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'leather-belt' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-015-32-BROW', '32', 'Brown', '#6B4226', 9, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-015-32-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-015-32-BROW', '32', 'Brown', '#6B4226', 9, 0
 from public.products where slug = 'leather-belt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-015-34-BROW', '34', 'Brown', '#6B4226', 25, 1
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-015-34-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-015-34-BROW', '34', 'Brown', '#6B4226', 25, 1
 from public.products where slug = 'leather-belt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-015-36-BROW', '36', 'Brown', '#6B4226', 5, 2
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-015-36-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-015-36-BROW', '36', 'Brown', '#6B4226', 5, 2
 from public.products where slug = 'leather-belt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-015-38-BROW', '38', 'Brown', '#6B4226', 18, 3
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-015-38-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-015-38-BROW', '38', 'Brown', '#6B4226', 18, 3
 from public.products where slug = 'leather-belt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-015-32-BLAC', '32', 'Black', '#1F1F1F', 2, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-015-32-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-015-32-BLAC', '32', 'Black', '#1F1F1F', 2, 100
 from public.products where slug = 'leather-belt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-015-34-BLAC', '34', 'Black', '#1F1F1F', 30, 101
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-015-34-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-015-34-BLAC', '34', 'Black', '#1F1F1F', 30, 101
 from public.products where slug = 'leather-belt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-015-36-BLAC', '36', 'Black', '#1F1F1F', 12, 102
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-015-36-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-015-36-BLAC', '36', 'Black', '#1F1F1F', 12, 102
 from public.products where slug = 'leather-belt'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-015-38-BLAC', '38', 'Black', '#1F1F1F', 8, 103
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-015-38-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-015-38-BLAC', '38', 'Black', '#1F1F1F', 8, 103
 from public.products where slug = 'leather-belt'
 on conflict (sku) do nothing;
 
 -- Canvas Baseball Cap
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'unisex', 'Canvas Baseball Cap', 'canvas-baseball-cap', 'A six-panel cotton canvas cap with an adjustable strap.', array['Cotton canvas', 'Adjustable back strap', 'Curved brim']::text[], 1299, null, true, false, true
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:canvas-baseball-cap') placing '4' from 13) placing '8' from 17)::uuid, id, 'unisex', 'Canvas Baseball Cap', 'canvas-baseball-cap', 'A six-panel cotton canvas cap with an adjustable strap.', array['Cotton canvas', 'Adjustable back strap', 'Curved brim']::text[], 1299, null, true, false, true
 from public.categories where slug = 'accessories'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/canvas-baseball-cap-1.svg', 'Canvas Baseball Cap', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:canvas-baseball-cap-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/canvas-baseball-cap-1.svg', 'Canvas Baseball Cap', 0
 from public.products where slug = 'canvas-baseball-cap'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'canvas-baseball-cap' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/canvas-baseball-cap-2.svg', 'Canvas Baseball Cap — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:canvas-baseball-cap-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/canvas-baseball-cap-2.svg', 'Canvas Baseball Cap — alternate view', 1
 from public.products where slug = 'canvas-baseball-cap'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'canvas-baseball-cap' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-016-ONES-BLAC', 'One Size', 'Black', '#1F1F1F', 18, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-016-ONES-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-016-ONES-BLAC', 'One Size', 'Black', '#1F1F1F', 18, 0
 from public.products where slug = 'canvas-baseball-cap'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-016-ONES-NAVY', 'One Size', 'Navy', '#1E2A44', 2, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-016-ONES-NAVY') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-016-ONES-NAVY', 'One Size', 'Navy', '#1E2A44', 2, 100
 from public.products where slug = 'canvas-baseball-cap'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-016-ONES-BEIG', 'One Size', 'Beige', '#D8C8AE', 30, 200
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-016-ONES-BEIG') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-016-ONES-BEIG', 'One Size', 'Beige', '#D8C8AE', 30, 200
 from public.products where slug = 'canvas-baseball-cap'
 on conflict (sku) do nothing;
 
 -- Leather Bifold Wallet
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Leather Bifold Wallet', 'leather-bifold-wallet', 'A slim bifold wallet with six card slots and a full-length note pocket.', array['Genuine leather', 'Six card slots', 'Slim profile']::text[], 2499, 2999, true, false, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:leather-bifold-wallet') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Leather Bifold Wallet', 'leather-bifold-wallet', 'A slim bifold wallet with six card slots and a full-length note pocket.', array['Genuine leather', 'Six card slots', 'Slim profile']::text[], 2499, 2999, true, false, false
 from public.categories where slug = 'accessories'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/leather-bifold-wallet-1.svg', 'Leather Bifold Wallet', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:leather-bifold-wallet-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/leather-bifold-wallet-1.svg', 'Leather Bifold Wallet', 0
 from public.products where slug = 'leather-bifold-wallet'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'leather-bifold-wallet' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/leather-bifold-wallet-2.svg', 'Leather Bifold Wallet — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:leather-bifold-wallet-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/leather-bifold-wallet-2.svg', 'Leather Bifold Wallet — alternate view', 1
 from public.products where slug = 'leather-bifold-wallet'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'leather-bifold-wallet' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-017-ONES-BROW', 'One Size', 'Brown', '#6B4226', 12, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-017-ONES-BROW') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-017-ONES-BROW', 'One Size', 'Brown', '#6B4226', 12, 0
 from public.products where slug = 'leather-bifold-wallet'
 on conflict (sku) do nothing;
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'ACC-017-ONES-BLAC', 'One Size', 'Black', '#1F1F1F', 8, 100
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:ACC-017-ONES-BLAC') placing '4' from 13) placing '8' from 17)::uuid, id, 'ACC-017-ONES-BLAC', 'One Size', 'Black', '#1F1F1F', 8, 100
 from public.products where slug = 'leather-bifold-wallet'
 on conflict (sku) do nothing;
 
 -- Archived Bomber Jacket
-insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, 'men', 'Archived Bomber Jacket', 'archived-bomber-jacket', 'Discontinued style kept for order history.', array[]::text[], 6999, null, false, false, false
+insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select overlay(overlay(md5('product:archived-bomber-jacket') placing '4' from 13) placing '8' from 17)::uuid, id, 'men', 'Archived Bomber Jacket', 'archived-bomber-jacket', 'Discontinued style kept for order history.', array[]::text[], 6999, null, false, false, false
 from public.categories where slug = 'jackets'
 on conflict (slug) do nothing;
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/archived-bomber-jacket-1.svg', 'Archived Bomber Jacket', 0
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:archived-bomber-jacket-1.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/archived-bomber-jacket-1.svg', 'Archived Bomber Jacket', 0
 from public.products where slug = 'archived-bomber-jacket'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'archived-bomber-jacket' and i.sort_order = 0);
-insert into public.product_images (product_id, url, alt, sort_order)
-select id, '/placeholders/archived-bomber-jacket-2.svg', 'Archived Bomber Jacket — alternate view', 1
+insert into public.product_images (id, product_id, url, alt, sort_order)
+select overlay(overlay(md5('image:archived-bomber-jacket-2.svg') placing '4' from 13) placing '8' from 17)::uuid, id, '/placeholders/archived-bomber-jacket-2.svg', 'Archived Bomber Jacket — alternate view', 1
 from public.products where slug = 'archived-bomber-jacket'
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = 'archived-bomber-jacket' and i.sort_order = 1);
-insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, 'JKT-018-M-OLIV', 'M', 'Olive', '#5B6236', 3, 0
+insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select overlay(overlay(md5('variant:JKT-018-M-OLIV') placing '4' from 13) placing '8' from 17)::uuid, id, 'JKT-018-M-OLIV', 'M', 'Olive', '#5B6236', 3, 0
 from public.products where slug = 'archived-bomber-jacket'
 on conflict (sku) do nothing;
 
 -- Coupons
-insert into public.coupons (code, description, discount_type, discount_value, min_order_amount, max_uses, valid_until) values ('WELCOME10', '10% off your first order (min. Rs 2,000)', 'percentage', 10, 2000, null, null) on conflict (code) do nothing;
-insert into public.coupons (code, description, discount_type, discount_value, min_order_amount, max_uses, valid_until) values ('FLAT500', 'Rs 500 off orders of Rs 4,000 or more', 'fixed', 500, 4000, 100, null) on conflict (code) do nothing;
-insert into public.coupons (code, description, discount_type, discount_value, min_order_amount, max_uses, valid_until) values ('EXPIRED20', 'Expired sample coupon', 'percentage', 20, 0, null, '2025-01-01T00:00:00Z') on conflict (code) do nothing;
+insert into public.coupons (id, code, description, discount_type, discount_value, min_order_amount, max_uses, valid_until) values (overlay(overlay(md5('coupon:WELCOME10') placing '4' from 13) placing '8' from 17)::uuid, 'WELCOME10', '10% off your first order (min. Rs 2,000)', 'percentage', 10, 2000, null, null) on conflict (code) do nothing;
+insert into public.coupons (id, code, description, discount_type, discount_value, min_order_amount, max_uses, valid_until) values (overlay(overlay(md5('coupon:FLAT500') placing '4' from 13) placing '8' from 17)::uuid, 'FLAT500', 'Rs 500 off orders of Rs 4,000 or more', 'fixed', 500, 4000, 100, null) on conflict (code) do nothing;
+insert into public.coupons (id, code, description, discount_type, discount_value, min_order_amount, max_uses, valid_until) values (overlay(overlay(md5('coupon:EXPIRED20') placing '4' from 13) placing '8' from 17)::uuid, 'EXPIRED20', 'Expired sample coupon', 'percentage', 20, 0, null, '2025-01-01T00:00:00Z') on conflict (code) do nothing;

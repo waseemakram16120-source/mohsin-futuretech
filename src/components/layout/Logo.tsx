@@ -17,7 +17,7 @@ export function Logo({ name, className }: { name: string; className?: string }) 
     >
       <span className="font-display text-xl font-semibold tracking-tight sm:text-2xl">{first}</span>
       {rest.length ? (
-        <span className="eyebrow text-[0.5625rem] tracking-[0.28em] text-muted transition-colors group-hover:text-accent sm:text-[0.625rem] sm:tracking-[0.14em]">
+        <span className="eyebrow text-[0.5625rem] tracking-[0.28em] text-ink-soft transition-colors group-hover:text-accent sm:text-[0.625rem] sm:tracking-[0.14em]">
           {rest.join(" ")}
         </span>
       ) : null}

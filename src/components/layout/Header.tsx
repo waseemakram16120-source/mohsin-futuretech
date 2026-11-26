@@ -35,7 +35,7 @@ export function Header({
   whatsappHref: string | null;
 }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-stone bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
+    <header className="sticky top-0 z-40 border-b border-stone bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/92">
       <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center lg:h-[4.5rem] lg:grid-cols-[auto_1fr_auto] lg:gap-8">
         <div className="flex items-center lg:hidden">
           <MobileMenu links={links} storeName={storeName} whatsappHref={whatsappHref} />

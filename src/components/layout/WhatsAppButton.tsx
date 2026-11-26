@@ -1,8 +1,15 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { WhatsAppIcon } from "@/components/ui/Icon";
+
+/** Pages where the floating button would cover form fields. */
+const HIDDEN_ON = ["/checkout"];
 
 /** Floating "chat on WhatsApp" button (hidden when no number is set). */
 export function WhatsAppButton({ href }: { href: string | null }) {
-  if (!href) return null;
+  const pathname = usePathname();
+  if (!href || HIDDEN_ON.some((p) => pathname.startsWith(p))) return null;
   return (
     <a
       href={href}

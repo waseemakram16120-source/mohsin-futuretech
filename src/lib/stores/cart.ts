@@ -48,3 +48,21 @@ export function addToCart(variantId: string, quantity: number, maxStock?: number
 export function useCart(): CartLine[] {
   return useSyncExternalStore(cartStore.subscribe, cartStore.get, cartStore.getServerSnapshot);
 }
+
+/** Pure: set a line's quantity (removes the line at 0). */
+export function setLineQuantity(lines: CartLine[], variantId: string, quantity: number): CartLine[] {
+  if (quantity <= 0) return lines.filter((l) => l.variantId !== variantId);
+  return lines.map((l) => (l.variantId === variantId ? { ...l, quantity: Math.min(MAX_QTY, Math.floor(quantity)) } : l));
+}
+
+export function updateCartQuantity(variantId: string, quantity: number) {
+  cartStore.set((lines) => setLineQuantity(lines, variantId, quantity));
+}
+
+export function removeFromCart(variantId: string) {
+  cartStore.set((lines) => lines.filter((l) => l.variantId !== variantId));
+}
+
+export function clearCart() {
+  cartStore.set(() => []);
+}

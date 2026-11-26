@@ -145,6 +145,12 @@ const coupons = [
 const q = (v) => (v === null || v === undefined ? "null" : `'${String(v).replace(/'/g, "''")}'`);
 const arr = (items) => `array[${items.map(q).join(", ")}]::text[]`;
 const code = (s) => s.toUpperCase().replace(/[^A-Z0-9]+/g, "").slice(0, 4);
+/**
+ * Stable ids (md5 of a namespaced key) so re-seeding gives every row the same
+ * id: cached pages, bags and wishlists stay valid across `supabase db reset`.
+ */
+// Version/variant nibbles are forced so the ids are valid RFC 4122 v4 UUIDs.
+const sid = (kind, key) => `overlay(overlay(md5(${q(`${kind}:${key}`)}) placing '4' from 13) placing '8' from 17)::uuid`;
 
 /** Deterministic stock: a mix of healthy, low (≤5) and sold-out variants. */
 function stockFor(pIndex, vIndex) {
@@ -218,7 +224,7 @@ for (const c of categories) {
   const img = `/placeholders/category-${c.slug}.svg`;
   writeFileSync(join(imgDir, `category-${c.slug}.svg`), placeholderSvg(c.shape, "#3B4252", 1));
   sql.push(
-    `insert into public.categories (name, slug, description, image_url, sort_order) values (${q(c.name)}, ${q(c.slug)}, ${q(c.description)}, ${q(img)}, ${c.sort}) on conflict (slug) do nothing;`,
+    `insert into public.categories (id, name, slug, description, image_url, sort_order) values (${sid("category", c.slug)}, ${q(c.name)}, ${q(c.slug)}, ${q(c.description)}, ${q(img)}, ${c.sort}) on conflict (slug) do nothing;`,
   );
 }
 sql.push("");
@@ -230,8 +236,8 @@ products.forEach((p, pIndex) => {
   const n = String(pIndex + 1).padStart(3, "0");
   sql.push(`-- ${p.name}`);
   sql.push(
-    `insert into public.products (category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
-select id, ${q(p.audience)}, ${q(p.name)}, ${q(p.slug)}, ${q(p.description)}, ${arr(p.details)}, ${p.price}, ${p.compare ?? "null"}, ${p.active === false ? "false" : "true"}, ${p.featured ? "true" : "false"}, ${p.isNew ? "true" : "false"}
+    `insert into public.products (id, category_id, audience, name, slug, description, details, base_price, compare_at_price, is_active, is_featured, is_new_arrival)
+select ${sid("product", p.slug)}, id, ${q(p.audience)}, ${q(p.name)}, ${q(p.slug)}, ${q(p.description)}, ${arr(p.details)}, ${p.price}, ${p.compare ?? "null"}, ${p.active === false ? "false" : "true"}, ${p.featured ? "true" : "false"}, ${p.isNew ? "true" : "false"}
 from public.categories where slug = ${q(p.category)}
 on conflict (slug) do nothing;`,
   );
@@ -241,8 +247,8 @@ on conflict (slug) do nothing;`,
     const file = `${p.slug}-${v}.svg`;
     writeFileSync(join(imgDir, file), placeholderSvg(shape, mainHex, v));
     sql.push(
-      `insert into public.product_images (product_id, url, alt, sort_order)
-select id, ${q(`/placeholders/${file}`)}, ${q(`${p.name}${v === 2 ? " — alternate view" : ""}`)}, ${v - 1}
+      `insert into public.product_images (id, product_id, url, alt, sort_order)
+select ${sid("image", file)}, id, ${q(`/placeholders/${file}`)}, ${q(`${p.name}${v === 2 ? " — alternate view" : ""}`)}, ${v - 1}
 from public.products where slug = ${q(p.slug)}
   and not exists (select 1 from public.product_images i join public.products pp on pp.id = i.product_id where pp.slug = ${q(p.slug)} and i.sort_order = ${v - 1});`,
     );
@@ -256,8 +262,8 @@ from public.products where slug = ${q(p.slug)}
       skus.add(sku);
       const stock = stockFor(pIndex, vIndex++);
       sql.push(
-        `insert into public.product_variants (product_id, sku, size, color, color_hex, stock_quantity, sort_order)
-select id, ${q(sku)}, ${q(size)}, ${q(color)}, ${q(COLORS[color])}, ${stock}, ${ci * 100 + si}
+        `insert into public.product_variants (id, product_id, sku, size, color, color_hex, stock_quantity, sort_order)
+select ${sid("variant", sku)}, id, ${q(sku)}, ${q(size)}, ${q(color)}, ${q(COLORS[color])}, ${stock}, ${ci * 100 + si}
 from public.products where slug = ${q(p.slug)}
 on conflict (sku) do nothing;`,
       );
@@ -269,7 +275,7 @@ on conflict (sku) do nothing;`,
 sql.push("-- Coupons");
 for (const c of coupons) {
   sql.push(
-    `insert into public.coupons (code, description, discount_type, discount_value, min_order_amount, max_uses, valid_until) values (${q(c.code)}, ${q(c.description)}, ${q(c.type)}, ${c.value}, ${c.min}, ${c.maxUses ?? "null"}, ${c.until ? q(c.until) : "null"}) on conflict (code) do nothing;`,
+    `insert into public.coupons (id, code, description, discount_type, discount_value, min_order_amount, max_uses, valid_until) values (${sid("coupon", c.code)}, ${q(c.code)}, ${q(c.description)}, ${q(c.type)}, ${c.value}, ${c.min}, ${c.maxUses ?? "null"}, ${c.until ? q(c.until) : "null"}) on conflict (code) do nothing;`,
   );
 }
 

@@ -34,8 +34,12 @@ function localSupabaseEnv(): Record<string, string> {
   }
 }
 
+const desktop = { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } };
+const mobile = { ...devices["Pixel 7"] };
+
 export default defineConfig({
   testDir: "tests/e2e",
+  globalSetup: "./tests/e2e/global-setup.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -45,14 +49,19 @@ export default defineConfig({
     trace: "off",
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    { name: "desktop", testIgnore: /checkout\.spec/, use: desktop },
+    { name: "mobile", testIgnore: /checkout\.spec/, use: mobile },
+    // Checkout tests change stock, coupons and orders, so the two device
+    // runs go one after the other instead of in parallel.
+    { name: "checkout-desktop", testMatch: /checkout\.spec/, use: desktop },
+    { name: "checkout-mobile", testMatch: /checkout\.spec/, use: mobile, dependencies: ["checkout-desktop"] },
   ],
   webServer: {
     // Tests run against a fresh production build, like Vercel.
     command: "bash scripts/serve-e2e.sh",
     url: `http://localhost:${PORT}/api/health`,
-    env: { ...localSupabaseEnv(), PORT: String(PORT) },
+    // Tests place many orders from one IP, so relax the per-IP order limit.
+    env: { ...localSupabaseEnv(), PORT: String(PORT), ORDER_RATE_LIMIT: "200" },
     reuseExistingServer: false,
     timeout: 300_000,
   },
