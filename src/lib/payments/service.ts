@@ -50,6 +50,10 @@ export async function authorisedOrder(orderNumber: string): Promise<PayableOrder
 
 const START_ERRORS: Record<string, { status: number; message: string }> = {
   already_paid: { status: 409, message: "This order is already paid." },
+  evidence_under_review: {
+    status: 409,
+    message: "We already have your payment details for this order and our team is reviewing them. Please don't pay again.",
+  },
   order_not_payable: { status: 409, message: "This order can no longer be paid online. Please contact us." },
   cod_order: { status: 409, message: "This order is Cash on Delivery." },
   provider_mismatch: { status: 409, message: "This payment method does not match your order." },

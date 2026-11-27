@@ -5,11 +5,34 @@ Implemented against `STRICT_JazzCash_Easypaisa_Payment_Integration.md` (on `main
 | Method | Status |
 |---|---|
 | Cash on Delivery | **Live-ready.** Admin marks it Paid after delivery. |
-| JazzCash (direct merchant) | **Core built and tested; provider adapter BLOCKED** — official merchant integration guide + sandbox credentials not yet available. Disabled (hidden at checkout) until completed. |
-| Easypaisa (direct merchant) | **Same as JazzCash.** |
-| NayaPay / manual receipt upload | **Retired.** Old orders stay readable; new ones are refused by the database. |
+| Easypaisa / JazzCash — **manual** (default) | **Live-ready (customer side).** Proposal §4: customer pays the store's account, submits Transaction ID + receipt screenshot, payment shows **Pending Verification** until an admin approves or rejects it. Offered only when the account name and number are set in `store_settings`. Admin review screen: Phase 7. |
+| Easypaisa / JazzCash — direct merchant gateway | **Core built and tested; provider adapters BLOCKED** — official merchant integration guide + sandbox credentials not yet available. Switched on per wallet with `PAYMENTS_GATEWAY_METHODS` once an adapter is complete. |
+| NayaPay | **Retired.** Old orders stay readable; new ones are refused by the database. |
 
-Production readiness: **NOT READY** for JazzCash/Easypaisa (see "Blockers").
+### Manual wallet flow (migration `0007_manual_wallet_payments`)
+
+```
+Checkout (Easypaisa/JazzCash, manual) ──► place_order()   payment: awaiting_payment
+Order page shows store account, exact amount, order number, steps
+Customer ──POST /api/payments/evidence (multipart)──►
+   ├─ same-origin + rate limit + strict field list
+   ├─ authorise: browser that placed it (signed cookie) or signed-in owner
+   ├─ Transaction ID: 6–40 letters/digits/dashes; note ≤ 500 chars (Zod)
+   ├─ receipt ≤ 5 MB, type from the file's BYTES (JPG/PNG/WebP only)
+   ├─ upload to PRIVATE bucket payment-receipts/<order_id>/receipt-….ext
+   └─ submit_payment_evidence()  → pending_verification (file deleted if refused)
+Admin ── review_payment(approve | reject + reason | mark_paid)
+```
+
+- A Transaction ID can back only one live submission (unique index).
+- One submission at a time; after a rejection the customer can resubmit
+  (new record, the rejected one stays as history).
+- Manual and gateway never overlap on one order: evidence is refused while a
+  gateway charge is pending, and a gateway charge cannot start while evidence
+  is under review.
+- Nothing a customer submits can make a payment approved or paid.
+
+Production readiness: manual wallets ready (customer side); direct gateway **NOT READY** for JazzCash/Easypaisa (see "Blockers").
 
 ---
 

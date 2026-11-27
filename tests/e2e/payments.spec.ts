@@ -81,12 +81,12 @@ test("successful payment: verified callback marks the order paid and confirmed",
 });
 
 test("failed and cancelled payments stay unpaid and can be retried without a duplicate attempt", async ({ page }) => {
-  const number = await orderWithGateway(page, "Easypaisa");
+  const number = await orderWithGateway(page, "JazzCash");
   await page.getByRole("button", { name: "Simulate failed payment" }).click();
   await expect(page.getByTestId("payment-message")).toContainText("Payment could not be completed");
   expect(await dbState(number)).toMatchObject({ payment_status: "awaiting_payment", attempts: ["failed"] });
 
-  await page.getByRole("button", { name: /Try again Rs 2,249 with Easypaisa/ }).click();
+  await page.getByRole("button", { name: /Try again Rs 2,249 with JazzCash/ }).click();
   await expect(page).toHaveURL(/\/payments\/test-gateway/);
   await page.getByRole("button", { name: "Simulate customer cancel" }).click();
   await expect(page.getByTestId("payment-message")).toContainText("Payment was cancelled");

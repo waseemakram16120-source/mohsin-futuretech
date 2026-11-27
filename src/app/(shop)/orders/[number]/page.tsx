@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PAYMENT_METHOD_LABELS, isGatewayMethod } from "@/config/store";
+import { ManualPaymentPanel } from "@/components/payments/ManualPaymentPanel";
 import { PaymentPanel } from "@/components/payments/PaymentPanel";
 import { TotalsTable } from "@/components/cart/CartSummary";
 import { Breadcrumbs } from "@/components/listing/ListingPage";
@@ -13,7 +14,9 @@ import { formatPkPhone } from "@/lib/checkout/phone";
 import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/lib/domain";
 import { formatPrice } from "@/lib/format";
 import { getOrderPlacedHere } from "@/lib/orders/queries";
-import { providerFor } from "@/lib/payments/registry";
+import { evidenceState } from "@/lib/payments/manual";
+import { isWalletAccountConfigured } from "@/lib/payments/methods";
+import { providerFor, walletMode } from "@/lib/payments/registry";
 import { paymentState } from "@/lib/payments/service";
 import type { AttemptStatus } from "@/lib/payments/status";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -52,9 +55,15 @@ export default async function OrderPage({ params, searchParams }: Props) {
     );
   }
 
-  const gateway = isGatewayMethod(order.payment_method) ? order.payment_method : null;
+  const wallet = isGatewayMethod(order.payment_method) ? order.payment_method : null;
+  // Manual wallets (proposal §4), or evidence already under review.
+  const manual = wallet !== null && (walletMode(wallet) === "manual" || order.payment_status === "pending_verification");
+  const gateway = wallet !== null && !manual ? wallet : null;
   const state = gateway ? await paymentState(order.order_number) : null;
   const provider = gateway ? providerFor(gateway) : null;
+  const evidence = manual ? await evidenceState(order.id) : null;
+  const liveSettings = manual ? await getStoreSettings({ live: true }) : null;
+  const walletAccount = wallet && liveSettings ? liveSettings.wallets[wallet] : null;
   const totals = {
     subtotal: order.subtotal,
     discount: order.discount_amount,
@@ -98,7 +107,25 @@ export default async function OrderPage({ params, searchParams }: Props) {
             <h2 id="next-steps" className="font-display text-2xl">
               What happens next
             </h2>
-            {gateway && state ? (
+            {manual && wallet ? (
+              <ManualPaymentPanel
+                orderNumber={order.order_number}
+                method={wallet}
+                amount={order.total_amount}
+                account={
+                  walletAccount && isWalletAccountConfigured(walletAccount)
+                    ? { accountName: walletAccount.accountName!, accountNumber: walletAccount.accountNumber! }
+                    : null
+                }
+                initial={{
+                  paymentStatus: order.payment_status,
+                  orderStatus: order.status,
+                  transactionId: evidence?.transaction_id ?? null,
+                  submittedAt: evidence?.submitted_at ?? null,
+                  reviewNote: evidence?.review_note ?? null,
+                }}
+              />
+            ) : gateway && state ? (
               <>
                 {provider?.id === "test" ? (
                   <p className="mt-3 rounded-xs border border-warning/40 bg-warning-soft px-3 py-2 text-xs font-medium text-warning">

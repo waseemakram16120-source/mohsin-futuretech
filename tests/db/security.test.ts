@@ -51,16 +51,15 @@ describe("schema guarantees", () => {
           where n.nspname = 'public'
             and p.proname in ('place_order', 'submit_payment_evidence', 'get_order_details',
                               'resolve_order_access', 'generate_order_number', 'start_payment_attempt',
-                              'apply_payment_event', 'payment_attempts_to_reconcile', 'order_payment_state')`,
+                              'apply_payment_event', 'payment_attempts_to_reconcile', 'order_payment_state',
+                              'order_payment_evidence')`,
       );
-      expect(rows).toHaveLength(9);
+      expect(rows).toHaveLength(10);
       for (const row of rows) {
         expect({ fn: row.fn, anon: row.anon, auth: row.auth }).toEqual({ fn: row.fn, anon: false, auth: false });
       }
-      // submit_payment_evidence is retired (receipts never mark anything paid).
-      const serverFns = rows.filter((r) => !["generate_order_number", "submit_payment_evidence"].includes(r.fn));
-      expect(serverFns.every((r) => r.service)).toBe(true);
-      expect(rows.find((r) => r.fn === "submit_payment_evidence")?.service).toBe(false);
+      const serverFns = rows.filter((r) => r.fn !== "generate_order_number");
+      expect(serverFns.filter((r) => !r.service)).toEqual([]);
     });
   });
 

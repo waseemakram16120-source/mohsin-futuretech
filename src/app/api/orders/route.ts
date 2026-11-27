@@ -4,7 +4,8 @@ import { ORDER_COOKIE, ORDER_COOKIE_MAX_AGE, rememberOrder, signOrders, verifyOr
 import { clientIp, createRateLimiter } from "@/lib/checkout/rate-limit";
 import { fieldErrors, placeOrderSchema } from "@/lib/checkout/schema";
 import { orderCookieKey } from "@/lib/checkout/server-keys";
-import { enabledPaymentMethods } from "@/lib/payments/registry";
+import { getStoreSettings } from "@/lib/catalog/queries";
+import { checkoutPaymentMethods } from "@/lib/payments/registry";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
     );
   }
   const { customer, items, paymentMethod, couponCode } = parsed.data;
-  if (!enabledPaymentMethods().includes(paymentMethod)) {
+  if (!checkoutPaymentMethods(await getStoreSettings({ live: true })).includes(paymentMethod)) {
     return Response.json(
       { error: "This payment method is not available right now. Please choose another.", fieldErrors: { paymentMethod: "This payment method is not available right now." } },
       { status: 409 },

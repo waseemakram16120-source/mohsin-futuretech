@@ -10,7 +10,7 @@ import { ProductImage } from "@/components/product/ProductImage";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { EmptyState, ErrorState } from "@/components/ui/States";
-import { PAYMENT_METHOD_LABELS, isGatewayMethod, type PaymentMethod } from "@/config/store";
+import { PAYMENT_METHOD_LABELS, isGatewayMethod, type GatewayMethod, type PaymentMethod } from "@/config/store";
 import { startPayment } from "@/components/payments/perform-action";
 import { CITY_SUGGESTIONS, PROVINCES, customerSchema, fieldErrors, placeOrderSchema } from "@/lib/checkout/schema";
 import { cn } from "@/lib/cn";
@@ -39,6 +39,11 @@ const METHOD_HELP: Record<PaymentMethod, string> = {
   cod: "Pay in cash when your parcel arrives.",
   jazzcash: "Pay now on JazzCash's secure page with your JazzCash account.",
   easypaisa: "Pay now on Easypaisa's secure page with your Easypaisa account.",
+};
+
+const MANUAL_HELP: Record<GatewayMethod, string> = {
+  jazzcash: "Send the amount to our JazzCash account, then upload your Transaction ID and receipt.",
+  easypaisa: "Send the amount to our Easypaisa account, then upload your Transaction ID and receipt.",
 };
 
 function FieldShell({
@@ -85,7 +90,7 @@ const inputCls = (invalid: boolean) =>
     invalid ? "border-sale" : "border-stone-strong focus:border-ink",
   );
 
-export function CheckoutForm({ methods }: { methods: PaymentMethod[] }) {
+export function CheckoutForm({ methods, manualMethods = [] }: { methods: PaymentMethod[]; manualMethods?: GatewayMethod[] }) {
   const router = useRouter();
   const { state, lines, coupon, hydrated, retry } = useQuote();
   const [values, setValues] = useState<Values>(EMPTY);
@@ -98,6 +103,8 @@ export function CheckoutForm({ methods }: { methods: PaymentMethod[] }) {
   const id = (f: string) => `${uid}-${f}`;
 
   const quote = state.quote;
+  const isManual = (m: PaymentMethod | ""): m is GatewayMethod => m !== "" && isGatewayMethod(m) && manualMethods.includes(m);
+  const isOnline = (m: PaymentMethod | ""): m is GatewayMethod => m !== "" && isGatewayMethod(m) && !manualMethods.includes(m);
   if (!hydrated || (!quote && state.status === "loading")) return <CartSkeleton />;
   if (lines.length === 0) {
     return (
@@ -164,7 +171,7 @@ export function CheckoutForm({ methods }: { methods: PaymentMethod[] }) {
       if (res.status === 201) {
         clearCart();
         setCouponCode(null);
-        if (isGatewayMethod(body.paymentMethod)) {
+        if (isOnline(body.paymentMethod)) {
           // Straight to the provider's secure page; if that cannot start,
           // the order page offers "Pay now" with the reason.
           const started = await startPayment(body.orderNumber).catch(() => ({ ok: false as const }));
@@ -342,7 +349,9 @@ export function CheckoutForm({ methods }: { methods: PaymentMethod[] }) {
                 />
                 <span>
                   <span className="block text-sm font-semibold">{PAYMENT_METHOD_LABELS[m]}</span>
-                  <span className="mt-1 block text-xs leading-relaxed text-ink-soft">{METHOD_HELP[m]}</span>
+                  <span className="mt-1 block text-xs leading-relaxed text-ink-soft">
+                    {isManual(m) ? MANUAL_HELP[m] : METHOD_HELP[m]}
+                  </span>
                 </span>
               </label>
             ))}
@@ -352,7 +361,14 @@ export function CheckoutForm({ methods }: { methods: PaymentMethod[] }) {
               <Icon name="alert" className="size-3.5" /> {errors.paymentMethod}
             </p>
           ) : null}
-          {method && isGatewayMethod(method) ? (
+          {isManual(method) ? (
+            <p className="mt-4 rounded-card bg-accent-soft p-4 text-sm text-accent-strong" data-testid="manual-payment-note">
+              After you place the order we&rsquo;ll show our {PAYMENT_METHOD_LABELS[method]} account details. Send exactly{" "}
+              <strong>{formatPrice(quote.totals.total)}</strong>, then upload your Transaction ID and a screenshot of the receipt. Your
+              payment shows as <strong>Pending Verification</strong> until our team checks it. Never share your PIN or OTP with anyone.
+            </p>
+          ) : null}
+          {isOnline(method) ? (
             <p className="mt-4 rounded-card bg-accent-soft p-4 text-sm text-accent-strong">
               After you place the order you&rsquo;ll be taken to {PAYMENT_METHOD_LABELS[method]}&rsquo;s secure page to pay{" "}
               <strong>{formatPrice(quote.totals.total)}</strong>. We never ask for your PIN or OTP on this website. Your order is
@@ -363,7 +379,7 @@ export function CheckoutForm({ methods }: { methods: PaymentMethod[] }) {
 
         <div className="hidden lg:block">
           <Button type="submit" size="lg" className="w-full" disabled={submitting || quote.hasIssues}>
-            {submitting ? "Placing your order…" : method && isGatewayMethod(method) ? `Place order & pay · ${formatPrice(quote.totals.total)}` : `Place order · ${formatPrice(quote.totals.total)}`}
+            {submitting ? "Placing your order…" : isOnline(method) ? `Place order & pay · ${formatPrice(quote.totals.total)}` : `Place order · ${formatPrice(quote.totals.total)}`}
           </Button>
         </div>
       </div>
@@ -408,7 +424,7 @@ export function CheckoutForm({ methods }: { methods: PaymentMethod[] }) {
         </div>
         <div className="mt-5 lg:hidden">
           <Button type="submit" size="lg" className="w-full" disabled={submitting || quote.hasIssues}>
-            {submitting ? "Placing your order…" : method && isGatewayMethod(method) ? `Place order & pay · ${formatPrice(quote.totals.total)}` : `Place order · ${formatPrice(quote.totals.total)}`}
+            {submitting ? "Placing your order…" : isOnline(method) ? `Place order & pay · ${formatPrice(quote.totals.total)}` : `Place order · ${formatPrice(quote.totals.total)}`}
           </Button>
         </div>
         <p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted">

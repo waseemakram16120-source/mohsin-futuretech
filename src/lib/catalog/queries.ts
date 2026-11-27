@@ -21,10 +21,14 @@ class CatalogError extends Error {
   }
 }
 
-/** Store settings; falls back to src/config/store.ts if the read fails. */
-export async function getStoreSettings(): Promise<StoreSettings> {
+/**
+ * Store settings; falls back to src/config/store.ts if the read fails.
+ * Pass { live: true } where stale values would matter (wallet account
+ * numbers a customer is about to pay into).
+ */
+export async function getStoreSettings({ live = false }: { live?: boolean } = {}): Promise<StoreSettings> {
   try {
-    const { data, error } = await createPublicClient()
+    const { data, error } = await createPublicClient({ cached: !live })
       .from("store_settings")
       .select("*")
       .eq("id", 1)

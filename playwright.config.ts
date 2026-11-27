@@ -70,6 +70,9 @@ export default defineConfig({
       // Easypaisa (whose adapters stay disabled until official docs arrive).
       PAYMENTS_ENV: "sandbox",
       PAYMENTS_TEST_GATEWAY: "1",
+      // JazzCash exercises the online gateway path; Easypaisa stays on the
+      // manual Transaction-ID + receipt flow (the production default).
+      PAYMENTS_GATEWAY_METHODS: "jazzcash",
       PAYMENTS_PUBLIC_BASE_URL: `http://localhost:${PORT}`,
     },
     reuseExistingServer: false,

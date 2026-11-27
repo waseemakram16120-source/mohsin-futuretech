@@ -26,6 +26,14 @@ export interface PaymentsConfig {
   testGateway: { enabled: boolean; reason: string };
   jazzcash: ProviderCredentials;
   easypaisa: ProviderCredentials;
+  /**
+   * Wallets paid through a direct merchant gateway. Every other wallet uses
+   * the MANUAL flow from the proposal (§4): the customer pays the store's
+   * account, then submits a Transaction ID + receipt for admin review.
+   * Default: none (all manual). Set PAYMENTS_GATEWAY_METHODS=jazzcash,easypaisa
+   * once a merchant gateway is approved and its adapter is complete.
+   */
+  gatewayMethods: Array<"jazzcash" | "easypaisa">;
   errors: string[];
 }
 
@@ -80,6 +88,17 @@ export function parsePaymentsConfig(env: Record<string, string | undefined>): Pa
       : { enabled: true, reason: "Sandbox test gateway enabled (no real money)." };
   if (testRequested && isProductionDeploy) errors.push("PAYMENTS_TEST_GATEWAY must not be set in production.");
 
+  const gatewayMethods: Array<"jazzcash" | "easypaisa"> = [];
+  for (const raw of (env.PAYMENTS_GATEWAY_METHODS ?? "").split(",")) {
+    const m = raw.trim().toLowerCase();
+    if (!m) continue;
+    if (m === "jazzcash" || m === "easypaisa") {
+      if (!gatewayMethods.includes(m)) gatewayMethods.push(m);
+    } else {
+      errors.push(`PAYMENTS_GATEWAY_METHODS: unknown method "${m}" ignored.`);
+    }
+  }
+
   return {
     env: payEnv,
     liveEnabled: liveEnabled && baseOk,
@@ -87,6 +106,7 @@ export function parsePaymentsConfig(env: Record<string, string | undefined>): Pa
     testGateway,
     jazzcash: credentials(env, PROVIDER_ENV_VARS.jazzcash),
     easypaisa: credentials(env, PROVIDER_ENV_VARS.easypaisa),
+    gatewayMethods,
     errors,
   };
 }
