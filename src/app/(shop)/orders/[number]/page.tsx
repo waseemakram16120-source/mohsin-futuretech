@@ -4,6 +4,7 @@ import { PAYMENT_METHOD_LABELS, isGatewayMethod } from "@/config/store";
 import { ManualPaymentPanel } from "@/components/payments/ManualPaymentPanel";
 import { PaymentPanel } from "@/components/payments/PaymentPanel";
 import { TotalsTable } from "@/components/cart/CartSummary";
+import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import { Breadcrumbs } from "@/components/listing/ListingPage";
 import { ProductImage } from "@/components/product/ProductImage";
 import { Badge } from "@/components/ui/Badge";
@@ -40,11 +41,14 @@ export default async function OrderPage({ params, searchParams }: Props) {
         <Icon name="box" className="size-10 text-muted" />
         <h1 className="mt-4 font-display text-3xl font-medium tracking-tight sm:text-4xl">We can&rsquo;t show this order here</h1>
         <p className="mt-3 max-w-md text-ink-soft">
-          For your privacy, order details are only shown on the device that placed the order. You can look it up with your
-          order number and phone number instead.
+          For your privacy, order details are only shown on the device that placed the order or to the signed-in account
+          that owns it. You can look it up with your order number and phone number instead.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <ButtonLink href="/track">Track an order</ButtonLink>
+          <ButtonLink href={`/login?next=${encodeURIComponent(`/orders/${number.toUpperCase()}`)}`} variant="secondary">
+            Sign in
+          </ButtonLink>
           {help ? (
             <ButtonLink href={help} variant="secondary" target="_blank" rel="noopener noreferrer">
               Ask on WhatsApp
@@ -156,6 +160,15 @@ export default async function OrderPage({ params, searchParams }: Props) {
                 </li>
               </ol>
             )}
+          </section>
+
+          <section aria-labelledby="progress-title" className="rounded-card border border-stone bg-surface p-5 sm:p-6">
+            <h2 id="progress-title" className="font-display text-2xl">
+              Order progress
+            </h2>
+            <div className="mt-5">
+              <OrderTimeline status={order.status} history={order.order_status_history} />
+            </div>
           </section>
 
           <section aria-labelledby="items-title">

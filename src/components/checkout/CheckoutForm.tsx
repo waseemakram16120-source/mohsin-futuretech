@@ -90,10 +90,54 @@ const inputCls = (invalid: boolean) =>
     invalid ? "border-sale" : "border-stone-strong focus:border-ink",
   );
 
-export function CheckoutForm({ methods, manualMethods = [] }: { methods: PaymentMethod[]; manualMethods?: GatewayMethod[] }) {
+export interface CheckoutAccount {
+  name: string;
+  phone: string;
+  email: string;
+  addresses: Array<{
+    id: string;
+    label: string;
+    fullName: string;
+    phone: string;
+    line1: string;
+    line2: string | null;
+    city: string;
+    province: string | null;
+    postalCode: string | null;
+    isDefault: boolean;
+  }>;
+}
+
+type SavedAddress = CheckoutAccount["addresses"][number];
+
+function valuesFromAccount(account: CheckoutAccount | null, address: SavedAddress | undefined): Values {
+  if (!account) return EMPTY;
+  return {
+    ...EMPTY,
+    name: address?.fullName ?? account.name,
+    phone: address?.phone ?? account.phone,
+    email: account.email,
+    address: address ? [address.line1, address.line2].filter(Boolean).join(", ") : "",
+    city: address?.city ?? "",
+    province: address?.province ?? "",
+    postalCode: address?.postalCode ?? "",
+  };
+}
+
+export function CheckoutForm({
+  methods,
+  manualMethods = [],
+  account = null,
+}: {
+  methods: PaymentMethod[];
+  manualMethods?: GatewayMethod[];
+  account?: CheckoutAccount | null;
+}) {
   const router = useRouter();
   const { state, lines, coupon, hydrated, retry } = useQuote();
-  const [values, setValues] = useState<Values>(EMPTY);
+  const defaultAddress = account?.addresses.find((a) => a.isDefault) ?? account?.addresses[0];
+  const [values, setValues] = useState<Values>(() => valuesFromAccount(account, defaultAddress));
+  const [addressId, setAddressId] = useState<string>(defaultAddress?.id ?? "");
   const [method, setMethod] = useState<PaymentMethod | "">("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -244,6 +288,60 @@ export function CheckoutForm({ methods, manualMethods = [] }: { methods: Payment
             </Link>{" "}
             before placing your order.
           </div>
+        ) : null}
+
+        {account ? (
+          <p className="text-sm text-ink-soft" data-testid="checkout-account">
+            Signed in as <strong className="text-ink">{account.email}</strong>. This order will appear in{" "}
+            <Link href="/account/orders" className="underline underline-offset-4">
+              your orders
+            </Link>
+            .
+          </p>
+        ) : (
+          <p className="rounded-card border border-stone bg-surface p-4 text-sm text-ink-soft">
+            Have an account?{" "}
+            <Link href="/login?next=/checkout" className="font-medium text-ink underline underline-offset-4">
+              Sign in
+            </Link>{" "}
+            to use your saved addresses — or continue as a guest.
+          </p>
+        )}
+
+        {account && account.addresses.length > 0 ? (
+          <fieldset>
+            <legend className="font-display text-2xl">Saved addresses</legend>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {account.addresses.map((a) => (
+                <label
+                  key={a.id}
+                  className={cn(
+                    "flex cursor-pointer gap-3 rounded-card border bg-surface p-4 text-sm",
+                    addressId === a.id ? "border-ink ring-1 ring-ink" : "border-stone-strong hover:border-ink",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="savedAddress"
+                    value={a.id}
+                    checked={addressId === a.id}
+                    onChange={() => {
+                      setAddressId(a.id);
+                      setValues((v) => ({ ...valuesFromAccount(account, a), notes: v.notes, email: v.email }));
+                      setErrors({});
+                    }}
+                    className="mt-0.5 size-4.5 accent-ink"
+                  />
+                  <span>
+                    <span className="block font-semibold">{a.label}</span>
+                    <span className="mt-1 block leading-relaxed text-ink-soft">
+                      {a.fullName} · {a.line1}, {a.city}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
         ) : null}
 
         <fieldset>

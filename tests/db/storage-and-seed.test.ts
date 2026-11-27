@@ -38,7 +38,8 @@ describe("storage buckets", () => {
       expect(await db.rows("select name from storage.objects where bucket_id = 'payment-receipts'")).toHaveLength(0);
 
       await db.as("authenticated", admin);
-      expect(await db.rows("select name from storage.objects where bucket_id = 'payment-receipts'")).toHaveLength(1);
+      // Only this test's file is checked: e2e runs may leave real receipts in the bucket.
+      expect(await db.rows("select name from storage.objects where bucket_id = 'payment-receipts' and name = 'some-order/r.jpg'")).toHaveLength(1);
     });
   });
 

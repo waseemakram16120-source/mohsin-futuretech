@@ -45,6 +45,10 @@ export const storeConfig = {
     /** Maximum quantity of one variant per order line. */
     maxQuantityPerLine: 10,
   },
+  wishlist: {
+    /** Maximum saved products (browser and account). */
+    maxItems: 100,
+  },
   uploads: {
     maxImageBytes: 5 * 1024 * 1024,
     allowedImageTypes: ["image/jpeg", "image/png", "image/webp"] as const,
