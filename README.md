@@ -8,7 +8,7 @@ Supabase (Postgres, Auth, Storage) · Zod · Vitest · Playwright · Vercel.
 
 > **Status:** all 10 phases complete — storefront, cart & checkout, manual
 > EasyPaisa/JazzCash payments, customer accounts, admin dashboard, reports,
-> final QA. Go-live steps: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+> final QA, plus live chat between customers and the store. Go-live steps: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 > Store staff: [docs/ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md).
 > QA results: [docs/QA-REPORT.md](docs/QA-REPORT.md).
 

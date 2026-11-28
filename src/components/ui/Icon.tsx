@@ -8,6 +8,8 @@ const paths = {
   menu: <path d="M3 6h18M3 12h18M3 18h18" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  chat: <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H9l-5 4V5.5z" />,
+  send: <path d="M4 12l16-8-6 16-2.5-6.5L4 12z" />,
   search: (
     <>
       <circle cx="11" cy="11" r="7" />

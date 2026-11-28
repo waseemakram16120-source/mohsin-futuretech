@@ -50,5 +50,8 @@ export const config = {
     "/api/orders",
     "/api/payments/:path*",
     "/api/wishlist/:path*",
+    "/api/chat/:path*",
+    "/api/chat",
+    "/api/admin/:path*",
   ],
 };

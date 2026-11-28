@@ -72,6 +72,7 @@ export default defineConfig({
       PAYMENT_RATE_LIMIT: "200",
       AUTH_RATE_LIMIT: "500",
       TRACK_RATE_LIMIT: "500",
+      CHAT_RATE_LIMIT: "500",
       // Sandbox only: the internal test gateway stands in for JazzCash /
       // Easypaisa (whose adapters stay disabled until official docs arrive).
       PAYMENTS_ENV: "sandbox",

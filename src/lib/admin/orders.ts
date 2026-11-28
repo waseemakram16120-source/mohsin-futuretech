@@ -83,6 +83,7 @@ const overviewSchema = z.object({
   low_stock: z.number(),
   out_of_stock: z.number(),
   low_stock_threshold: z.number(),
+  chats_waiting: z.number().default(0),
 });
 export type AdminOverview = z.infer<typeof overviewSchema>;
 

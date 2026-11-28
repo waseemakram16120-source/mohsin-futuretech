@@ -87,6 +87,18 @@ improvement would be to render a server-side summary of the bag.
 | CSV export | Spreadsheet formulas neutralised (CSV-injection safe). |
 | Dependencies | `npm audit`: 0 vulnerabilities. |
 
+### Live chat (added after Phase 10)
+Customers chat with the store from a button on every page; admins answer in
+Admin → Messages. Guests are tied to their chat by a random token kept in an
+httpOnly cookie (only its SHA-256 is stored); signed-in customers by their
+account. RLS (forced) lets customers read only their own chat; all writes go
+through server-checked database functions; admin functions require the admin
+role; messages are plain text (1–1000 characters, control characters
+stripped) and rate-limited. Updates arrive by polling (4 s while the chat is
+open, 30 s for the unread badge) rather than Supabase Realtime, because
+Realtime's RLS cannot cover guests without an account. Tests: 4 unit, 5
+database, 8 end-to-end (desktop + mobile).
+
 ### Known limitations / recommendations (not blocking launch)
 1. **Rate limits are per server instance** (in memory). On Vercel they still stop
    simple abuse; for heavy traffic move them to a shared store (e.g. Upstash).
@@ -98,6 +110,9 @@ improvement would be to render a server-side summary of the bag.
 4. **Admin two-factor login** is not enabled; Supabase MFA can be added later.
 5. **Backups** depend on the Supabase plan (daily backups on Pro; point-in-time
    recovery is an add-on) — see Phase 10.
+6. **Chat notifications**: admins see new chats only while the admin site is
+   open (no email/WhatsApp/push alert yet). A guest who clears cookies or
+   changes device cannot reopen their old chat (they start a new one).
 
 ## 5. Comparison with the reference stores
 

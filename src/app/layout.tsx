@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import { storeConfig } from "@/config/store";
 import { AccountSync } from "@/components/auth/AccountSync";
+import { ChatWidget } from "@/components/chat/ChatWidget";
+import { policies } from "@/config/policies";
 import { Footer } from "@/components/layout/Footer";
 import { AnnouncementBar, Header } from "@/components/layout/Header";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
@@ -89,6 +91,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         </main>
         <Footer settings={settings} shopLinks={nav} paymentMethods={enabledPaymentMethods()} />
         <WhatsAppButton href={whatsappHref} />
+        <ChatWidget storeName={settings.storeName} hours={policies.businessHours} whatsappHref={whatsappHref} />
         <AccountSync />
       </body>
     </html>

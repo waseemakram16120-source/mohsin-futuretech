@@ -22,9 +22,10 @@ your password; each staff member should have their own account.
    payments to verify, orders to confirm, delivered COD orders to mark paid.
    The numbers next to **Orders**, **Payments** and **Inventory** in the menu
    show the same.
-2. **Payments** → verify EasyPaisa / JazzCash payments (section 3).
-3. **Orders** → confirm new COD orders, pack, ship, deliver (section 4).
-4. **Inventory** → restock anything marked low (section 6).
+2. **Messages** → answer customer chats (section 4a).
+3. **Payments** → verify EasyPaisa / JazzCash payments (section 3).
+4. **Orders** → confirm new COD orders, pack, ship, deliver (section 4).
+5. **Inventory** → restock anything marked low (section 6).
 
 ## 3. Verifying EasyPaisa / JazzCash payments
 
@@ -79,6 +80,33 @@ notes) on their order page, in My Account and on **Track your order**.
 
 After the rider hands over the cash: **Payments → Cash on Delivery to collect**
 → **Mark as paid** (or from the order page).
+
+## 4a. Messages (live chat)
+
+Customers can chat with the store from the round **chat button** at the
+bottom-right of every page (not on checkout). They give their name, and
+optionally their mobile number and order number. Signed-in customers' chats
+follow their account.
+
+**Admin → Messages**:
+
+- **Open** chats are listed newest first; a red number shows unread
+  messages. The **Messages** item in the menu and the Dashboard show how many
+  chats are waiting. New messages appear by themselves every few seconds —
+  keep this page open while you are available.
+- Open a chat to see the conversation, the customer's phone (call or
+  **WhatsApp**), email and order number (tap to open the order).
+- Type a reply and press **Enter** (Shift + Enter for a new line). The
+  customer sees it within a few seconds.
+- **Close chat** when the question is answered. If the customer writes again
+  they start a new chat; replying to a closed chat reopens it.
+
+Good to know:
+- There is **no alert on your phone** when a chat arrives — check Messages
+  regularly during business hours (the hours shown to customers are in
+  `src/config/policies.ts`). Customers who need you urgently can still use
+  WhatsApp.
+- Never ask for or accept a customer's PIN, OTP or card number in chat.
 
 ## 5. Products
 
@@ -204,6 +232,8 @@ All dates are Pakistan time.
 **Naya product:** Products → **Add product** → naam, price, category → har size aur rang ki line, shuru ka stock ke saath → **Create product** → tasveerein upload karein (3:4 portrait, 1MB se kam). Sale ke liye purani qeemat **Was price** mein likhein.
 
 **Product band karna:** **Archive** karne se product shop se chhup jata hai, lekin purane orders mehfooz rehte hain.
+
+**Messages (live chat):** customer site par chat ke button se message bhejte hain. Admin → **Messages** mein laal number wali chats nayi hain. Chat kholein, jawab likhein aur **Enter** dabayein. Customer ko kuch second mein jawab mil jata hai. Kaam ho jaye to **Close chat** karein. Phone par alert nahi aata, is liye kaam ke auqaat mein yeh page khula rakhein.
 
 **Reports:** din, hafta, mahina ya apni dates chunein. Sales, wusooli aur best sellers dekhein. **Download CSV** se Excel mein khulta hai.
 

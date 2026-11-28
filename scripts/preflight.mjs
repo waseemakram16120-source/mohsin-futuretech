@@ -100,7 +100,7 @@ if (settings.status !== 200 || !Array.isArray(settings.body) || settings.body.le
   fail(`store_settings not found (HTTP ${settings.status}) — run the migrations in supabase/migrations/ first`);
 } else ok("store_settings row exists");
 
-const tables = ["profiles", "products", "product_variants", "orders", "payments", "payment_attempts", "inventory_movements", "wishlist"];
+const tables = ["profiles", "products", "product_variants", "orders", "payments", "payment_attempts", "inventory_movements", "wishlist", "chat_conversations", "chat_messages"];
 for (const t of tables) {
   const r = await get(`/rest/v1/${t}?select=*&limit=0`);
   if (r.status === 401 || r.status === 403) {
@@ -115,10 +115,10 @@ if (!failures) ok(`${tables.length} core tables present`);
 // (never called: calling place_order would create an order).
 const spec = await get("/rest/v1/");
 const rpc = new Set(Object.keys(spec.body?.paths ?? {}).filter((p) => p.startsWith("/rpc/")).map((p) => p.slice(5)));
-const expected = ["place_order", "submit_payment_evidence", "review_payment", "update_order_status", "adjust_stock", "admin_overview", "admin_customers", "admin_save_product", "admin_report"];
+const expected = ["place_order", "submit_payment_evidence", "review_payment", "update_order_status", "adjust_stock", "admin_overview", "admin_customers", "admin_save_product", "admin_report", "chat_start", "chat_admin_reply"];
 const missing = expected.filter((fn) => !rpc.has(fn));
 if (rpc.size === 0) warn("could not read the API description to check functions");
-else if (missing.length) fail(`functions missing: ${missing.join(", ")} — apply every file in supabase/migrations/ (latest: 20261129000011_admin_reports.sql)`);
+else if (missing.length) fail(`functions missing: ${missing.join(", ")} — apply every file in supabase/migrations/ (latest: 20261130000012_live_chat.sql)`);
 else ok(`all ${expected.length} database functions present (migrations applied)`);
 
 const admins = await get("/rest/v1/profiles?role=eq.admin&select=id");

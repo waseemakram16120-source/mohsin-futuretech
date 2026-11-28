@@ -63,7 +63,7 @@ design is not part of this release.
 ## 2. Create the database (migrations)
 
 The whole database — tables, security rules (RLS), functions and the two
-storage buckets — is in `supabase/migrations/`, 11 files applied in name order.
+storage buckets — is in `supabase/migrations/`, 12 files applied in name order.
 
 **Option A — Supabase CLI (recommended).** On a computer with Node.js 20+ and
 the repository cloned:
@@ -84,8 +84,8 @@ npx supabase link --project-ref <your-project-ref>
 npx supabase db push --dry-run
 ```
 
-The dry run must list all 11 migrations, from `20261126000001_schema.sql` to
-`20261129000011_admin_reports.sql`. Then apply them:
+The dry run must list all 12 migrations, from `20261126000001_schema.sql` to
+`20261130000012_live_chat.sql`. Then apply them:
 
 ```bash
 npx supabase db push
@@ -231,6 +231,8 @@ headers and sitemap. Fix every **✗**; review every **!**. Delete
 - [ ] Customer: My Account → Orders shows "Delivered"; `/track` finds the order
 - [ ] COD order: Delivered → Payments → **Mark as paid**
 - [ ] Admin → Reports shows the test orders; **Download CSV** opens in Excel
+- [ ] Live chat: as a customer, open the chat button and send a message →
+      Admin → **Messages** shows it → reply → the customer sees the reply
 - [ ] Cancel the test orders (stock returns) or leave them, as the owner prefers
 
 ## 9. Backups & recovery

@@ -16,12 +16,19 @@ export default async function AdminDashboard() {
     <div>
       <AdminPageHeader title="Dashboard" description={`Signed in as ${admin.name}.`} />
 
-      {o.payments_to_verify > 0 || o.orders_pending > 0 || o.cod_to_collect > 0 ? (
+      {o.payments_to_verify > 0 || o.orders_pending > 0 || o.cod_to_collect > 0 || o.chats_waiting > 0 ? (
         <section aria-labelledby="todo" className="mb-8 rounded-card border border-warning/30 bg-warning-soft p-4 text-sm text-warning sm:p-5">
           <h2 id="todo" className="font-semibold">
             Needs your attention
           </h2>
           <ul className="mt-2 list-disc space-y-1 pl-5">
+            {o.chats_waiting > 0 ? (
+              <li>
+                <Link href="/admin/messages" className="underline">
+                  {o.chats_waiting} chat{o.chats_waiting === 1 ? "" : "s"} waiting for a reply
+                </Link>
+              </li>
+            ) : null}
             {o.payments_to_verify > 0 ? (
               <li>
                 <Link href="/admin/payments" className="underline">
