@@ -36,7 +36,7 @@ export function StatCard({ label, value, hint, href, tone = "neutral" }: { label
   const body = (
     <>
       <p className="text-xs font-semibold uppercase tracking-[0.1em] text-muted">{label}</p>
-      <p className={cn("mt-2 font-display text-3xl tabular-nums", tone === "warning" && "text-warning")}>{value}</p>
+      <p className={cn("mt-2 font-display text-2xl tabular-nums sm:text-3xl", tone === "warning" && "text-warning")}>{value}</p>
       {hint ? <p className="mt-1 text-xs text-ink-soft">{hint}</p> : null}
     </>
   );

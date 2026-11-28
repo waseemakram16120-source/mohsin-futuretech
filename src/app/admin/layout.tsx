@@ -37,6 +37,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     { href: "/admin/categories", label: "Categories" },
     { href: "/admin/inventory", label: "Inventory", badge: counts.low },
     { href: "/admin/customers", label: "Customers" },
+    { href: "/admin/reports", label: "Reports" },
     { href: "/admin/coupons", label: "Coupons" },
     { href: "/admin/settings", label: "Settings" },
   ];

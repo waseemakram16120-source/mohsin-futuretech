@@ -160,7 +160,7 @@ test("inventory: add and remove stock with a reason; can't go below zero", async
   // A dedicated variant so parallel runs don't interfere.
   const t = tag().toUpperCase();
   const [p] = await sql<{ id: string }>(
-    "insert into products (name, slug, base_price, audience) values ($1, $2, 1500, 'unisex') returning id",
+    "insert into products (name, slug, base_price, audience, is_active) values ($1, $2, 1500, 'unisex', false) returning id", // hidden from the shop
     [`Stock Test ${t}`, `stock-test-${t.toLowerCase()}`],
   );
   await sql("insert into product_variants (product_id, sku, size, color, stock_quantity) values ($1, $2, 'One Size', 'Black', 2)", [p.id, `STK-${t}`]);
@@ -170,6 +170,7 @@ test("inventory: add and remove stock with a reason; can't go below zero", async
   const row = page.getByTestId("inventory-row").filter({ hasText: `STK-${t}` });
   await expect(row.getByTestId("stock-qty")).toHaveText("2");
   await expect(row).toContainText("Low stock");
+  await expect(row).toContainText("Archived product"); // test item is hidden from the shop
 
   await row.getByLabel(`Quantity for STK-${t}`).fill("10");
   await row.getByRole("button", { name: `Add stock to STK-${t}` }).click();

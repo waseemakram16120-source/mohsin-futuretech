@@ -63,9 +63,14 @@ export default async function AdminDashboard() {
           <h2 id="recent" className="font-display text-2xl">
             Recent orders
           </h2>
-          <Link href="/admin/orders" className="text-sm underline underline-offset-4">
-            All orders
-          </Link>
+          <span className="flex gap-4 text-sm">
+            <Link href="/admin/reports" className="underline underline-offset-4">
+              Sales reports
+            </Link>
+            <Link href="/admin/orders" className="underline underline-offset-4">
+              All orders
+            </Link>
+          </span>
         </div>
         {recent.length ? <AdminOrderTable rows={recent} /> : <EmptyState icon="bag" title="No orders yet" />}
       </section>
