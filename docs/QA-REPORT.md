@@ -118,8 +118,9 @@ those references**, not a live side-by-side check.
 
 ## 6. Still needed from the client before launch
 - Real products, photos, prices and stock (replace the 17 samples).
-- EasyPaisa / JazzCash account name and number (Admin → Settings).
-- WhatsApp number, phone, email, shop address (Admin → Settings).
+- ~~EasyPaisa / JazzCash accounts, WhatsApp, phone, email, shop address~~ —
+  received (owner Muhammad Waseem); applied by `supabase/setup/store-details.sql`
+  at deployment. Confirm both wallets are registered in that name.
 - Confirm the shipping/returns/privacy/terms wording in `src/config/policies.ts`,
   then set `draft: false`.
 - The production Supabase project and Vercel account (Phase 10).

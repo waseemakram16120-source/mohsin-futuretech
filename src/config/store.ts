@@ -18,12 +18,14 @@ export const storeConfig = {
   currencySymbol: "Rs",
   locale: "en-PK",
   timeZone: "Asia/Karachi",
+  /** Store owner (client): Muhammad Waseem. */
+  owner: "Muhammad Waseem",
   contact: {
-    // Placeholder values — replace from Admin → Settings.
-    phone: "+92 300 0000000",
-    whatsapp: "923000000000",
-    email: "support@example.com",
-    address: "Shop address, Karachi, Pakistan",
+    // Provided by the client. Admin → Settings (database) overrides these.
+    phone: "+92 308 2340478",
+    whatsapp: "923082340478", // wa.me format
+    email: "mwbusiness.com12@gmail.com",
+    address: "Korangi Industrial Area, Karachi, Pakistan",
   },
   social: {
     instagram: "",

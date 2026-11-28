@@ -26,8 +26,13 @@ You need:
       email is for testing only and sends just a few emails per hour). Any SMTP
       provider works — e.g. Resend, Brevo, SendGrid, Zoho Mail — with a sender
       address on your domain such as `no-reply@your-domain`.
-- [ ] From the client: EasyPaisa / JazzCash account name + number, WhatsApp
-      number, phone, email, shop address, delivery charge, products & photos.
+- [x] From the client (received): owner Muhammad Waseem, WhatsApp / phone /
+      EasyPaisa / JazzCash 0308 2340478, email mwbusiness.com12@gmail.com,
+      address Korangi Industrial Area, Karachi — stored in
+      `supabase/setup/store-details.sql` and as the site defaults in
+      `src/config/store.ts`.
+- [ ] Still from the client: delivery charge confirmation, products & photos,
+      approval of the policy wording.
 
 ### The old live site
 
@@ -181,9 +186,15 @@ Give admin only to people who handle orders and payments.
 
 ## 6. Set up the shop (Admin)
 
-See `docs/ADMIN-GUIDE.md`. In short:
+First load the client's store details and wallet accounts: Supabase → **SQL
+Editor** → paste `supabase/setup/store-details.sql` → **Run**. Before running,
+confirm with the owner that both wallet accounts are registered in the name
+**Muhammad Waseem** (customers see that name when paying). The query at the end
+shows the saved values.
 
-1. **Settings**: store name, WhatsApp, phone, email, address, delivery charge,
+Then see `docs/ADMIN-GUIDE.md`. In short:
+
+1. **Settings** (check what the SQL saved; change anything later here): store name, WhatsApp, phone, email, address, delivery charge,
    free-delivery amount, low-stock level, **EasyPaisa and JazzCash account
    name + number** (double-check them — customers pay exactly what is shown).
 2. **Categories** → photos for each.
