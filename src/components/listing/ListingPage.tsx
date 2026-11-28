@@ -179,7 +179,7 @@ export async function ListingPage({
               <ul className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-10 xl:grid-cols-4" data-testid="product-grid">
                 {listing.products.map((product, i) => (
                   <li key={product.id}>
-                    <ProductCard product={product} priority={i < 4} sizes="(min-width: 1280px) 20vw, (min-width: 640px) 30vw, 50vw" />
+                    <ProductCard product={product} priority={i < 4} headingLevel={2} sizes="(min-width: 1280px) 20vw, (min-width: 640px) 30vw, 50vw" />
                   </li>
                 ))}
               </ul>

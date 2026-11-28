@@ -1,6 +1,6 @@
 import "server-only";
 
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { couponMessage } from "@/lib/checkout/errors";
 import { computeTotals, type Totals } from "@/lib/checkout/totals";
 import { getStoreSettings } from "@/lib/catalog/queries";

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { clientIp, createRateLimiter } from "@/lib/checkout/rate-limit";
 import { MAX_RECEIPT_BYTES, evidenceFieldsSchema } from "@/lib/payments/evidence";
 import { submitEvidence } from "@/lib/payments/manual";

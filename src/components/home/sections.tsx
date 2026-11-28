@@ -110,7 +110,7 @@ export function Hero({ freeDeliveryMin, images }: { freeDeliveryMin: number; ima
                 className="relative col-span-3 aspect-[3/4] overflow-hidden rounded-card bg-surface shadow-lift"
               >
                 {main.image ? (
-                  <ProductImage src={main.image.url} alt={main.image.alt} fill priority sizes="(min-width: 1024px) 28vw, 55vw" className="object-cover" />
+                  <ProductImage src={main.image.url} alt="" fill priority sizes="(min-width: 1024px) 28vw, 55vw" className="object-cover" />
                 ) : null}
                 <span className="absolute inset-x-3 bottom-3 rounded-xs bg-surface/95 px-3 py-2 text-xs font-medium">
                   {main.name}
@@ -119,10 +119,11 @@ export function Hero({ freeDeliveryMin, images }: { freeDeliveryMin: number; ima
               {second ? (
                 <Link
                   href={`/products/${second.slug}`}
+                  aria-label={second.name}
                   className="relative col-span-2 mt-16 aspect-[3/4] self-start overflow-hidden rounded-card bg-surface shadow-lift"
                 >
                   {second.image ? (
-                    <ProductImage src={second.image.url} alt={second.image.alt} fill priority sizes="(min-width: 1024px) 18vw, 35vw" className="object-cover" />
+                    <ProductImage src={second.image.url} alt="" fill priority sizes="(min-width: 1024px) 18vw, 35vw" className="object-cover" />
                   ) : null}
                 </Link>
               ) : null}

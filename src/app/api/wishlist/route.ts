@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { storeConfig } from "@/config/store";
 import { getSessionUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";

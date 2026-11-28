@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { couponCodeSchema } from "@/lib/checkout/schema";
 import { quoteCart } from "@/lib/orders/quote";
 

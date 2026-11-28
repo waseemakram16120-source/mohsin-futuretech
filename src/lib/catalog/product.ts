@@ -2,7 +2,7 @@
  * Product detail view-model and variant selection logic. Pure module —
  * shared by the server page and the client purchase panel, unit-tested.
  */
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { AUDIENCES, type Audience } from "@/lib/domain";
 import { sortSizes } from "./filters";
 

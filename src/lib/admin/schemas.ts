@@ -2,7 +2,7 @@
  * Admin form validation (Zod), shared by the browser and the Server
  * Actions. The database re-checks every constraint.
  */
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { AUDIENCES, DISCOUNT_TYPES } from "@/lib/domain";
 import { normalizePkPhone } from "@/lib/checkout/phone";
 

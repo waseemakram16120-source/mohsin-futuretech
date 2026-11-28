@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { ORDER_COOKIE, verifyOrders } from "@/lib/checkout/order-access";
 import { orderCookieKey } from "@/lib/checkout/server-keys";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/domain";

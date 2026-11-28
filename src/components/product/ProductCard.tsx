@@ -13,11 +13,15 @@ export function ProductCard({
   product,
   priority = false,
   sizes = "(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw",
+  headingLevel = 3,
 }: {
   product: ProductCardData;
   priority?: boolean;
   sizes?: string;
+  /** 2 on pages where the cards sit right under the page h1 (listings, wishlist). */
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const discount = discountPercent(product.price, product.compareAtPrice);
   const href = `/products/${product.slug}`;
 
@@ -27,7 +31,9 @@ export function ProductCard({
         {product.image ? (
           <ProductImage
             src={product.image.url}
-            alt={product.image.alt}
+            // The product name is the card's heading right below; repeating it
+            // as alt text makes screen readers announce every product twice.
+            alt=""
             fill
             sizes={sizes}
             priority={priority}
@@ -80,11 +86,11 @@ export function ProductCard({
 
       <div className="mt-3 flex flex-1 flex-col gap-1">
         {product.categoryName ? <p className="text-xs text-muted">{product.categoryName}</p> : null}
-        <h3 className="text-sm leading-snug font-medium text-ink">
+        <Heading className="text-sm leading-snug font-medium text-ink">
           <Link href={href} className="after:absolute after:inset-0 hover:underline hover:underline-offset-4">
             {product.name}
           </Link>
-        </h3>
+        </Heading>
         <div className="flex items-baseline gap-1">
           {product.priceVaries ? <span className="text-xs text-muted">From</span> : null}
           <Price price={product.price} compareAt={product.compareAtPrice} />

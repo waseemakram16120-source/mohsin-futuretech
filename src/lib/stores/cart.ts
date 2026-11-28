@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { storeConfig } from "@/config/store";
 import { createLocalStore } from "./local-store";
 

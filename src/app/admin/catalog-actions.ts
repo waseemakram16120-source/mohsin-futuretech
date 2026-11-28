@@ -2,7 +2,7 @@
 
 import { randomBytes } from "node:crypto";
 import { revalidatePath, updateTag } from "next/cache";
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { adminActionError } from "@/lib/admin/auth";
 import { adminErrorMessage } from "@/lib/admin/errors";
 import { categoryInputSchema, couponInputSchema, firstIssues, productInputSchema, settingsInputSchema } from "@/lib/admin/schemas";

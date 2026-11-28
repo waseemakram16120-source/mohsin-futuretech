@@ -9,7 +9,7 @@
  *   - The internal test gateway can NEVER run in production.
  *   - A provider with missing credentials is disabled — never faked.
  */
-import { z } from "zod";
+import { z } from "@/lib/z";
 
 const blank = (v: string | undefined) => (v && v.trim() ? v.trim() : undefined);
 

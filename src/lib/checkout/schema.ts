@@ -2,7 +2,7 @@
  * Checkout validation — ONE schema used by the browser (inline errors) and
  * by POST /api/orders (authoritative). The database re-checks again.
  */
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { PAYMENT_METHODS } from "@/config/store";
 import { normalizePkPhone } from "./phone";
 

@@ -1,5 +1,5 @@
 /** Report shape (validated) and CSV export. Pure: unit-tested. */
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { ALL_PAYMENT_METHODS, PAYMENT_METHOD_LABELS } from "@/config/store";
 import { periodLabel } from "./report-range";
 

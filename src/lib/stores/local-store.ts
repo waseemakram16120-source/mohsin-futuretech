@@ -4,7 +4,7 @@
  * corrupted or old data falls back to the empty value instead of crashing.
  * Changes in another tab are picked up through the "storage" event.
  */
-import type { z } from "zod";
+import type { z } from "@/lib/z";
 
 export interface LocalStore<T> {
   get(): T;

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { getProductCardsByIds } from "@/lib/catalog/queries";
 
 const querySchema = z.object({

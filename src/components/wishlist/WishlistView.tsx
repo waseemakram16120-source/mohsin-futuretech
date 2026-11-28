@@ -92,7 +92,7 @@ export function WishlistView() {
       <ul className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4" data-testid="wishlist-grid">
         {products.map((product) => (
           <li key={product.id}>
-            <ProductCard product={product} />
+            <ProductCard product={product} headingLevel={2} />
           </li>
         ))}
       </ul>

@@ -2,7 +2,7 @@
  * Account form validation — shared by the browser (inline errors) and the
  * Server Actions (authoritative). The database re-checks profiles/addresses.
  */
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { PROVINCES } from "@/lib/checkout/schema";
 import { normalizePkPhone } from "@/lib/checkout/phone";
 

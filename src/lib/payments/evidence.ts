@@ -6,7 +6,7 @@
  * The receipt type is decided from the file's own bytes (magic numbers),
  * never from the file name or the browser-sent MIME type.
  */
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { storeConfig } from "@/config/store";
 
 export const MAX_RECEIPT_BYTES = storeConfig.uploads.maxImageBytes;

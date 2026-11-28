@@ -18,7 +18,7 @@ export default function SizeGuidePage() {
       </p>
       <div className="mt-10 grid gap-10 lg:grid-cols-2">
         {Object.values(SIZE_CHARTS).map((chart) => (
-          <section key={chart.id} className="rounded-card border border-stone bg-surface p-6">
+          <section key={chart.id} className="min-w-0 rounded-card border border-stone bg-surface p-4 sm:p-6">
             <SizeChartTable chart={chart} />
           </section>
         ))}

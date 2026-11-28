@@ -3,7 +3,7 @@
  * schema drift fails loudly instead of rendering "undefined". Pure module:
  * no server-only imports, so it is unit-tested directly.
  */
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { AUDIENCES, type Audience } from "@/lib/domain";
 import { storeConfig } from "@/config/store";
 

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { ALL_PAYMENT_METHODS } from "@/config/store";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/server";

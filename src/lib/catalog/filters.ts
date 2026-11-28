@@ -7,7 +7,7 @@
  * Parsing is forgiving: anything invalid is dropped, never thrown, so a
  * hand-edited URL still shows a sensible page. Pure module (unit-tested).
  */
-import { z } from "zod";
+import { z } from "@/lib/z";
 
 export const PAGE_SIZE = 24;
 const MAX_VALUES = 20;

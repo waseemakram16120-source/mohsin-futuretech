@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { adminActionError } from "@/lib/admin/auth";
 import { adminErrorMessage } from "@/lib/admin/errors";
 import { ORDER_STATUSES } from "@/lib/domain";

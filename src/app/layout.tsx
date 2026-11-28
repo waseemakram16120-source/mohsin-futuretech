@@ -21,10 +21,8 @@ const inter = localFont({
 });
 
 const fraunces = localFont({
-  src: [
-    { path: "./fonts/fraunces-latin-wght.woff2", style: "normal" },
-    { path: "./fonts/fraunces-latin-wght-italic.woff2", style: "italic" },
-  ],
+  // Upright only: the design never uses italics, so the 45 KB italic file is not shipped.
+  src: [{ path: "./fonts/fraunces-latin-wght.woff2", style: "normal" }],
   variable: "--font-fraunces",
   weight: "100 900",
   display: "swap",

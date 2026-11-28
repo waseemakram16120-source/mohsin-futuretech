@@ -13,8 +13,52 @@ const supabaseImages = (() => {
   }
 })();
 
+const supabaseOrigin = (() => {
+  try {
+    return process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin : "";
+  } catch {
+    return "";
+  }
+})();
+const isHttps = (process.env.NEXT_PUBLIC_SITE_URL ?? "").startsWith("https://");
+const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * Content Security Policy without nonces, so catalogue pages stay static
+ * and cached (a nonce would force every page to render per request).
+ * Next.js needs inline scripts/styles; everything else is locked down:
+ * no framing, no plugins, no foreign base/form targets, and network calls
+ * only to this site and Supabase. When a direct payment gateway that posts
+ * a form to the provider is enabled, add its host to form-action.
+ */
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' blob: data: ${supabaseOrigin}`.trim(),
+  "font-src 'self'",
+  `connect-src 'self' ${supabaseOrigin}`.trim(),
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  ...(isHttps ? ["upgrade-insecure-requests"] : []),
+].join("; ");
+
+const securityHeaders = [
+  { key: "Content-Security-Policy", value: csp },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  ...(isHttps ? [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" }] : []),
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async headers() {
+    return [{ source: "/(.*)", headers: securityHeaders }];
+  },
   images: {
     // Product photos uploaded by the admin live in the public
     // `product-images` Supabase Storage bucket.

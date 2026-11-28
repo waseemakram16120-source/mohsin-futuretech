@@ -17,7 +17,10 @@ describe("ProductCard", () => {
     expect(link).toHaveAttribute("href", "/products/mens-quilted-puffer-jacket");
     expect(screen.getByText("Jackets")).toBeInTheDocument();
     expect(screen.getByText("Rs 7,999")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "Men's Quilted Puffer Jacket" })).toBeInTheDocument();
+    // The photo is decorative: the name is already the card's heading/link,
+    // so screen readers don't hear it twice.
+    expect(screen.queryByRole("img", { name: "Men's Quilted Puffer Jacket" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Men's Quilted Puffer Jacket" })).toBeInTheDocument();
   });
 
   it("shows the discount badge and both prices on sale", () => {

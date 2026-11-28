@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { z } from "zod";
+import { z } from "@/lib/z";
 import { createLocalStore } from "./local-store";
 
 /** The coupon code the shopper applied in the bag (validated server-side). */

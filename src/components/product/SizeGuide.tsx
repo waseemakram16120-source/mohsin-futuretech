@@ -6,7 +6,8 @@ import { Icon } from "@/components/ui/Icon";
 
 export function SizeChartTable({ chart, caption = true }: { chart: SizeChart; caption?: boolean }) {
   return (
-    <div className="overflow-x-auto">
+    // Scrolls sideways on very narrow phones; focusable so keyboards can scroll it too.
+    <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={`${chart.title} size chart`}>
       <table className="w-full min-w-[20rem] border-collapse text-sm">
         {caption ? <caption className="mb-3 text-left font-semibold">{chart.title} (inches)</caption> : null}
         <thead>
