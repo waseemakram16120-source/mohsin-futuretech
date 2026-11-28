@@ -1,177 +1,123 @@
-/**
- * /admin/orders — order management (PDF §5): search by order number /
- * customer / phone, filter by order status, payment status and payment
- * method, sort by date or total. Live via API, demo via local orders.
- */
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { adminGet } from "@/lib/admin-client";
-import { getDemoAdminOrders } from "@/lib/admin-data";
-import type { AdminOrder } from "@/lib/admin-types";
-import { formatPKR, ORDER_STATUSES } from "@/lib/constants";
-import type { OrderStatus, PaymentMethod, PaymentStatus } from "@/lib/types";
-import {
-  EmptyState,
-  LoadingState,
-  OrderStatusBadge,
-  PageTitle,
-  PaymentStatusBadge,
-} from "@/components/admin-ui";
+import { AdminOrderTable, AdminPageHeader } from "@/components/admin/ui";
+import { inputClasses } from "@/components/forms/Field";
+import { Button, ButtonLink } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/States";
+import { PAYMENT_METHOD_LABELS, PAYMENT_METHODS } from "@/config/store";
+import { requireAdmin } from "@/lib/admin/auth";
+import { listOrders, orderFiltersSchema } from "@/lib/admin/orders";
+import { ORDER_STATUSES, ORDER_STATUS_LABELS, PAYMENT_STATUSES, PAYMENT_STATUS_LABELS } from "@/lib/domain";
 
-export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<AdminOrder[] | null>(null);
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<OrderStatus | "all">("all");
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | "all">("all");
-  const [method, setMethod] = useState<PaymentMethod | "all">("all");
-  const [sort, setSort] = useState<"newest" | "oldest" | "total-desc" | "total-asc">("newest");
+export const metadata: Metadata = { title: "Orders" };
 
-  useEffect(() => {
-    adminGet("/api/admin/orders")
-      .then((json) => {
-        if (json.mode === "live" && Array.isArray(json.orders)) {
-          setOrders(json.orders as AdminOrder[]);
-        } else {
-          setOrders(getDemoAdminOrders());
-        }
-      })
-      .catch(() => setOrders(getDemoAdminOrders()));
-  }, []);
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
-  const filtered = useMemo(() => {
-    if (!orders) return [];
-    const q = query.trim().toLowerCase();
-    const list = orders.filter((o) => {
-      if (q && ![o.orderNumber, o.customerName, o.phone].join(" ").toLowerCase().includes(q)) {
-        return false;
-      }
-      if (status !== "all" && o.status !== status) return false;
-      if (paymentStatus !== "all" && o.paymentStatus !== paymentStatus) return false;
-      if (method !== "all" && o.paymentMethod !== method) return false;
-      return true;
-    });
-    return list.sort((a, b) => {
-      if (sort === "newest") return b.createdAt.localeCompare(a.createdAt);
-      if (sort === "oldest") return a.createdAt.localeCompare(b.createdAt);
-      if (sort === "total-desc") return b.totalAmount - a.totalAmount;
-      return a.totalAmount - b.totalAmount;
-    });
-  }, [orders, query, status, paymentStatus, method, sort]);
-
-  if (!orders) return <LoadingState label="Loading orders…" />;
+export default async function AdminOrdersPage({ searchParams }: Props) {
+  await requireAdmin("/admin/orders");
+  const raw = await searchParams;
+  const one = (k: string) => (typeof raw[k] === "string" && raw[k] !== "" ? (raw[k] as string) : undefined);
+  const filters = orderFiltersSchema.parse({ q: one("q"), status: one("status"), payment: one("payment"), method: one("method"), page: one("page") });
+  const { rows, total, page, pageSize } = await listOrders(filters);
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  const filtered = Boolean(filters.q || filters.status || filters.payment || filters.method);
+  const pageHref = (p: number) => {
+    const sp = new URLSearchParams();
+    for (const k of ["q", "status", "payment", "method"] as const) if (filters[k]) sp.set(k, String(filters[k]));
+    if (p > 1) sp.set("page", String(p));
+    const s = sp.toString();
+    return `/admin/orders${s ? `?${s}` : ""}`;
+  };
 
   return (
     <div>
-      <PageTitle
-        title="Orders"
-        subtitle={`${filtered.length} of ${orders.length} orders`}
-      />
+      <AdminPageHeader title="Orders" description={`${total.toLocaleString("en-PK")} order${total === 1 ? "" : "s"}${filtered ? " match your filters" : ""}.`} />
 
-      <div className="mb-4 grid gap-2 rounded-lg border bg-white p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-5">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search order no., name or phone…"
-          className="rounded border px-3 py-2 text-sm"
-        />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as OrderStatus | "all")}
-          className="rounded border px-3 py-2 text-sm"
-          aria-label="Order status"
-        >
-          <option value="all">All statuses</option>
-          {ORDER_STATUSES.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
-        <select
-          value={paymentStatus}
-          onChange={(e) => setPaymentStatus(e.target.value as PaymentStatus | "all")}
-          className="rounded border px-3 py-2 text-sm"
-          aria-label="Payment status"
-        >
-          <option value="all">All payments</option>
-          <option value="pending_verification">Pending Verification</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-          <option value="due">Due on Delivery</option>
-          <option value="paid">Paid</option>
-        </select>
-        <select
-          value={method}
-          onChange={(e) => setMethod(e.target.value as PaymentMethod | "all")}
-          className="rounded border px-3 py-2 text-sm"
-          aria-label="Payment method"
-        >
-          <option value="all">All methods</option>
-          <option value="cod">Cash on Delivery</option>
-          <option value="easypaisa">EasyPaisa</option>
-          <option value="jazzcash">JazzCash</option>
-          <option value="nayapay">NayaPay</option>
-        </select>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as typeof sort)}
-          className="rounded border px-3 py-2 text-sm"
-          aria-label="Sort orders"
-        >
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-          <option value="total-desc">Total: high to low</option>
-          <option value="total-asc">Total: low to high</option>
-        </select>
-      </div>
-
-      {filtered.length === 0 ? (
-        <EmptyState message="No orders match these filters." />
-      ) : (
-        <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="bg-zinc-50 text-xs uppercase text-zinc-500">
-              <tr>
-                <th className="px-4 py-3">Order</th>
-                <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Payment</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filtered.map((o) => (
-                <tr key={o.id} className="hover:bg-zinc-50">
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/orders/${o.id}`} className="font-medium text-sky-700">
-                      {o.orderNumber}
-                    </Link>
-                    <span className="block text-xs text-zinc-500">
-                      {new Date(o.createdAt).toLocaleString("en-PK")}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {o.customerName}
-                    <span className="block text-xs text-zinc-500">{o.phone}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <PaymentStatusBadge status={o.paymentStatus} />
-                    <span className="block text-xs capitalize text-zinc-500">
-                      {o.paymentMethod === "cod" ? "COD" : o.paymentMethod}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <OrderStatusBadge status={o.status} />
-                  </td>
-                  <td className="px-4 py-3 text-right font-semibold">
-                    {formatPKR(o.totalAmount)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <form method="get" className="mb-6 grid gap-3 rounded-card border border-stone bg-surface p-4 sm:grid-cols-2 xl:grid-cols-[1fr_repeat(3,11rem)_auto]" role="search" aria-label="Filter orders">
+        <div>
+          <label htmlFor="f-q" className="text-xs font-medium text-ink-soft">
+            Search
+          </label>
+          <input id="f-q" name="q" defaultValue={filters.q} placeholder="Order number, name or phone" className={inputClasses(false)} />
         </div>
+        <div>
+          <label htmlFor="f-status" className="text-xs font-medium text-ink-soft">
+            Order status
+          </label>
+          <select id="f-status" name="status" defaultValue={filters.status ?? ""} className={inputClasses(false)}>
+            <option value="">All</option>
+            {ORDER_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {ORDER_STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="f-payment" className="text-xs font-medium text-ink-soft">
+            Payment status
+          </label>
+          <select id="f-payment" name="payment" defaultValue={filters.payment ?? ""} className={inputClasses(false)}>
+            <option value="">All</option>
+            {PAYMENT_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {PAYMENT_STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="f-method" className="text-xs font-medium text-ink-soft">
+            Method
+          </label>
+          <select id="f-method" name="method" defaultValue={filters.method ?? ""} className={inputClasses(false)}>
+            <option value="">All</option>
+            {PAYMENT_METHODS.map((m) => (
+              <option key={m} value={m}>
+                {PAYMENT_METHOD_LABELS[m]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-end gap-2">
+          <Button type="submit" className="h-12">
+            Apply
+          </Button>
+          {filtered ? (
+            <ButtonLink href="/admin/orders" variant="ghost" className="h-12">
+              Clear
+            </ButtonLink>
+          ) : null}
+        </div>
+      </form>
+
+      {rows.length ? (
+        <AdminOrderTable rows={rows} />
+      ) : (
+        <EmptyState icon="bag" title={filtered ? "No orders match" : "No orders yet"} description={filtered ? "Try a different search or clear the filters." : undefined} />
       )}
+
+      {pages > 1 ? (
+        <nav aria-label="Pagination" className="mt-6 flex items-center justify-between text-sm">
+          {page > 1 ? (
+            <Link href={pageHref(page - 1)} className="underline underline-offset-4" rel="prev">
+              ← Newer
+            </Link>
+          ) : (
+            <span />
+          )}
+          <span className="text-muted">
+            Page {page} of {pages}
+          </span>
+          {page < pages ? (
+            <Link href={pageHref(page + 1)} className="underline underline-offset-4" rel="next">
+              Older →
+            </Link>
+          ) : (
+            <span />
+          )}
+        </nav>
+      ) : null}
     </div>
   );
 }

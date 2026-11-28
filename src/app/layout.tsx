@@ -1,48 +1,98 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import LayoutShell from "@/components/LayoutShell";
-import { getCategories } from "@/lib/data/store";
-import { StoreProvider } from "@/context/StoreContext";
-import { AuthProvider } from "@/context/AuthContext";
+import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
+import type { ReactNode } from "react";
+import { storeConfig } from "@/config/store";
+import { AccountSync } from "@/components/auth/AccountSync";
+import { ChatWidget } from "@/components/chat/ChatWidget";
+import { policies } from "@/config/policies";
+import { Footer } from "@/components/layout/Footer";
+import { AnnouncementBar, Header } from "@/components/layout/Header";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { buildPrimaryNav } from "@/components/layout/nav";
+import type { Category } from "@/lib/catalog/mappers";
+import { getCategories, getStoreSettings } from "@/lib/catalog/queries";
+import { enabledPaymentMethods } from "@/lib/payments/registry";
+import { whatsappLink } from "@/lib/whatsapp";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const inter = localFont({
+  src: "./fonts/inter-latin-wght.woff2",
+  variable: "--font-inter",
+  weight: "100 900",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const fraunces = localFont({
+  src: [{ path: "./fonts/fraunces-latin-wght.woff2", style: "normal" }],
+  variable: "--font-fraunces",
+  weight: "100 900",
+  display: "swap",
+});
+
+/**
+ * The italic display face is used for a single accent word in the hero, so
+ * it is NOT preloaded: it downloads after the page has rendered (swap) and
+ * never delays the first paint on slow connections.
+ */
+const frauncesItalic = localFont({
+  src: "./fonts/fraunces-latin-wght-italic.woff2",
+  style: "italic",
+  weight: "100 900",
+  variable: "--font-fraunces-italic",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
-  title: "Mohsin FutureTech — Online Fashion Store",
-  description:
-    "Mohsin FutureTech online fashion & clothing store. Browse collections, shop jeans, jackets, shirts and more — COD, EasyPaisa, JazzCash and NayaPay accepted.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  title: {
+    default: `${storeConfig.name} — Menswear & Womenswear Online in Pakistan`,
+    template: `%s | ${storeConfig.name}`,
+  },
+  description: `${storeConfig.tagline} Jackets, jeans, shirts, trousers and accessories. Cash on Delivery, JazzCash and Easypaisa.`,
+  openGraph: { type: "website", siteName: storeConfig.name, locale: "en_PK" },
 };
 
-// The layout fetches categories from Supabase (via the cookie-based server
-// client) on every render, so the whole app must render dynamically.
-// Without this, `next build` tries to prerender pages statically and fails
-// with "uncached or runtime data during prerendering" as soon as the
-// Supabase env vars are set (in demo mode the local fallback has no
-// runtime data, so the build passed). See Vercel redeploy failure 2026-11-24.
-export const dynamic = "force-dynamic";
+export const viewport: Viewport = {
+  themeColor: "#14161a",
+};
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const categories = await getCategories();
+/** Catalogue pages refresh at most every 60 seconds (see lib/supabase/public). */
+export const revalidate = 60;
+
+async function safeCategories(): Promise<Category[]> {
+  try {
+    return await getCategories();
+  } catch (error) {
+    // The navigation still works without category links.
+    console.error("[layout] categories unavailable", error);
+    return [];
+  }
+}
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const [settings, categories] = await Promise.all([getStoreSettings(), safeCategories()]);
+  const nav = buildPrimaryNav(categories);
+  const whatsappHref = whatsappLink(settings.whatsapp, `Hi ${settings.storeName}, I have a question.`);
+
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="flex min-h-full flex-col bg-white text-zinc-900">
-        <AuthProvider>
-          <StoreProvider>
-            <LayoutShell categories={categories}>{children}</LayoutShell>
-          </StoreProvider>
-        </AuthProvider>
+    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${frauncesItalic.variable}`}>
+      <body className="flex min-h-dvh flex-col">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded-xs focus:bg-ink focus:px-4 focus:py-2 focus:text-surface"
+        >
+          Skip to content
+        </a>
+        <AnnouncementBar freeDeliveryMin={settings.freeDeliveryMin} />
+        <Header links={nav} storeName={settings.storeName} whatsappHref={whatsappHref} />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <Footer settings={settings} shopLinks={nav} paymentMethods={enabledPaymentMethods()} />
+        <WhatsAppButton href={whatsappHref} />
+        <ChatWidget storeName={settings.storeName} hours={policies.businessHours} whatsappHref={whatsappHref} />
+        <AccountSync />
       </body>
     </html>
   );

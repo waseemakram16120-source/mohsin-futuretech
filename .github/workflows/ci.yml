@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  # One run per change: pull requests, and main after merging. (Running on
+  # both "push" and "pull_request" for the same branch started two runs at
+  # once whose local Supabase stacks collided on the same ports.)
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - name: Database tests (local Supabase Postgres)
+        run: |
+          npm run db:start
+          npm run test:db
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e -- --trace off

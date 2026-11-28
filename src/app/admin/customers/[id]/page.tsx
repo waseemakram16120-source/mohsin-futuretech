@@ -1,118 +1,95 @@
-/**
- * /admin/customers/[id] — customer detail: profile + order history.
- */
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
-import { adminGet } from "@/lib/admin-client";
-import { getDemoAdminCustomers, getDemoAdminOrders } from "@/lib/admin-data";
-import type { AdminCustomer, AdminOrder } from "@/lib/admin-types";
-import { formatPKR } from "@/lib/constants";
-import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-  OrderStatusBadge,
-  PageTitle,
-} from "@/components/admin-ui";
+import { notFound } from "next/navigation";
+import { AdminOrderTable, AdminPageHeader, adminDate } from "@/components/admin/ui";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/States";
+import { requireAdmin } from "@/lib/admin/auth";
+import { getCustomer } from "@/lib/admin/catalog";
+import { formatPkPhone } from "@/lib/checkout/phone";
+import { formatPrice } from "@/lib/format";
+import { whatsappLink } from "@/lib/whatsapp";
+import type { AdminOrderRow } from "@/lib/admin/orders";
 
-export default function AdminCustomerDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
-  const [customer, setCustomer] = useState<AdminCustomer | null>(null);
-  const [orders, setOrders] = useState<AdminOrder[] | null>(null);
-  const [notFound, setNotFound] = useState(false);
+export const metadata: Metadata = { title: "Customer" };
 
-  useEffect(() => {
-    adminGet(`/api/admin/customers/${id}`)
-      .then((json) => {
-        if (json.mode === "live" && json.customer) {
-          setCustomer(json.customer as AdminCustomer);
-          setOrders((json.orders as AdminOrder[]) ?? []);
-        } else {
-          const found = getDemoAdminCustomers().find((c) => c.id === id) ?? null;
-          setCustomer(found);
-          if (found) {
-            setOrders(
-              getDemoAdminOrders().filter((o) => o.phone === found.phone),
-            );
-          } else {
-            setNotFound(true);
-          }
-        }
-      })
-      .catch(() => {
-        const found = getDemoAdminCustomers().find((c) => c.id === id) ?? null;
-        setCustomer(found);
-        if (found) {
-          setOrders(getDemoAdminOrders().filter((o) => o.phone === found.phone));
-        } else {
-          setNotFound(true);
-        }
-      });
-  }, [id]);
+type Props = { params: Promise<{ id: string }> };
 
-  if (notFound) return <ErrorState message="Customer not found." />;
-  if (!customer || !orders) return <LoadingState label="Loading customer…" />;
-
+export default async function AdminCustomerPage({ params }: Props) {
+  const { id } = await params;
+  await requireAdmin(`/admin/customers/${id}`);
+  const data = await getCustomer(id);
+  if (!data) notFound();
+  const { profile, addresses, orders } = data;
+  const spent = orders.filter((o) => o.status !== "cancelled" && o.status !== "returned").reduce((n, o) => n + o.total_amount, 0);
+  const wa = profile.phone ? whatsappLink(`92${profile.phone.slice(1)}`, `Hi ${profile.full_name || ""}`.trim()) : null;
   return (
-    <div>
-      <PageTitle
-        title={customer.fullName}
-        subtitle={customer.email}
-        action={<Link href="/admin/customers" className="text-sm text-sky-700 underline">← All customers</Link>}
-      />
-
-      <div className="mb-4 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase text-zinc-500">Phone</p>
-          <p className="mt-1 font-semibold">{customer.phone ?? "—"}</p>
-        </div>
-        <div className="rounded-lg border bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase text-zinc-500">Orders</p>
-          <p className="mt-1 font-semibold">{customer.orderCount}</p>
-        </div>
-        <div className="rounded-lg border bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase text-zinc-500">Total spent</p>
-          <p className="mt-1 font-semibold">{formatPKR(customer.totalSpent)}</p>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <p className="mb-2 text-sm">
+          <Link href="/admin/customers" className="underline underline-offset-4">
+            ← All customers
+          </Link>
+        </p>
+        <AdminPageHeader
+          title={profile.full_name || profile.email}
+          description={`Joined ${adminDate.format(new Date(profile.created_at))} · ${orders.length} order${orders.length === 1 ? "" : "s"} · ${formatPrice(spent)} spent`}
+          actions={profile.role === "admin" ? <Badge tone="dark">Admin</Badge> : undefined}
+        />
       </div>
-
-      <h2 className="mb-2 font-semibold text-[#0f2440]">Order history</h2>
-      {orders.length === 0 ? (
-        <EmptyState message="No orders for this customer yet." />
-      ) : (
-        <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
-          <table className="w-full min-w-[560px] text-left text-sm">
-            <thead className="bg-zinc-50 text-xs uppercase text-zinc-500">
-              <tr>
-                <th className="px-4 py-3">Order</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {orders.map((o) => (
-                <tr key={o.id} className="hover:bg-zinc-50">
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/orders/${o.id}`} className="font-medium text-sky-700">
-                      {o.orderNumber}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">{new Date(o.createdAt).toLocaleDateString("en-PK")}</td>
-                  <td className="px-4 py-3"><OrderStatusBadge status={o.status} /></td>
-                  <td className="px-4 py-3 text-right font-semibold">{formatPKR(o.totalAmount)}</td>
-                </tr>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <section className="rounded-card border border-stone bg-surface p-5" aria-label="Contact">
+          <h2 className="font-display text-xl">Contact</h2>
+          <p className="mt-3 text-sm">
+            <a href={`mailto:${profile.email}`} className="underline underline-offset-4">
+              {profile.email}
+            </a>
+          </p>
+          {profile.phone ? (
+            <p className="text-sm">
+              <a href={`tel:${profile.phone}`} className="underline underline-offset-4">
+                {formatPkPhone(profile.phone)}
+              </a>
+              {wa ? (
+                <>
+                  {" · "}
+                  <a href={wa} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+                    WhatsApp
+                  </a>
+                </>
+              ) : null}
+            </p>
+          ) : (
+            <p className="text-sm text-ink-soft">No phone on profile</p>
+          )}
+        </section>
+        <section className="rounded-card border border-stone bg-surface p-5" aria-label="Saved addresses">
+          <h2 className="font-display text-xl">Saved addresses</h2>
+          {addresses.length ? (
+            <ul className="mt-3 space-y-3 text-sm">
+              {addresses.map((a) => (
+                <li key={a.id}>
+                  <p className="font-medium">
+                    {a.label} {a.is_default ? <Badge tone="dark">Default</Badge> : null}
+                  </p>
+                  <p className="text-ink-soft">
+                    {a.full_name} · {formatPkPhone(a.phone)} · {a.address_line1}
+                    {a.address_line2 ? `, ${a.address_line2}` : ""}, {a.city}
+                  </p>
+                </li>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </ul>
+          ) : (
+            <p className="mt-3 text-sm text-ink-soft">None saved.</p>
+          )}
+        </section>
+      </div>
+      <section aria-labelledby="c-orders">
+        <h2 id="c-orders" className="mb-4 font-display text-2xl">
+          Order history
+        </h2>
+        {orders.length ? <AdminOrderTable rows={orders as AdminOrderRow[]} /> : <EmptyState icon="bag" title="No orders yet" />}
+      </section>
     </div>
   );
 }

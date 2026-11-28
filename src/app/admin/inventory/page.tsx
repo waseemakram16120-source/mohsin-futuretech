@@ -1,199 +1,124 @@
-/**
- * /admin/inventory — stock by variation (PDF §5): track stock per
- * size/colour, low-stock indicators, and stock adjustment controls
- * (+/− and set value). Live via API, demo via the local catalogue.
- */
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { StockAdjuster } from "@/components/admin/StockAdjuster";
+import { AdminPageHeader, adminDate } from "@/components/admin/ui";
+import { inputClasses } from "@/components/forms/Field";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/States";
+import { requireAdmin } from "@/lib/admin/auth";
+import { listInventory, recentMovements } from "@/lib/admin/catalog";
+import { cn } from "@/lib/cn";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { adminGet, adminSend } from "@/lib/admin-client";
-import { getAdminProducts, saveAdminProducts } from "@/lib/admin-data";
-import type { AdminProduct } from "@/lib/admin-types";
-import {
-  EmptyState,
-  LoadingState,
-  PageTitle,
-} from "@/components/admin-ui";
+export const metadata: Metadata = { title: "Inventory" };
 
-interface InventoryRow {
-  id: string;
-  productId: string;
-  productName: string;
-  sku: string;
-  size: string;
-  color: string;
-  stock: number;
-}
+const REASON_LABEL: Record<string, string> = { initial: "Opening stock", order: "Order", cancel: "Order cancelled", return: "Order returned", adjustment: "Adjustment" };
 
-export default function AdminInventoryPage() {
-  const [rows, setRows] = useState<InventoryRow[] | null>(null);
-  const [query, setQuery] = useState("");
-  const [onlyLow, setOnlyLow] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+type Props = { searchParams: Promise<{ q?: string; level?: string }> };
 
-  const load = useCallback(() => {
-    adminGet("/api/admin/inventory")
-      .then((json) => {
-        if (json.mode === "live" && Array.isArray(json.inventory)) {
-          setRows(json.inventory as InventoryRow[]);
-        } else {
-          setRows(
-            getAdminProducts().flatMap((p) =>
-              p.variants.map((v) => ({
-                id: v.id,
-                productId: p.id,
-                productName: p.name,
-                sku: v.sku,
-                size: v.size,
-                color: v.color,
-                stock: v.stock,
-              })),
-            ),
-          );
-        }
-      })
-      .catch(() =>
-        setRows(
-          getAdminProducts().flatMap((p) =>
-            p.variants.map((v) => ({
-              id: v.id,
-              productId: p.id,
-              productName: p.name,
-              sku: v.sku,
-              size: v.size,
-              color: v.color,
-              stock: v.stock,
-            })),
-          ),
-        ),
-      );
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const filtered = useMemo(() => {
-    if (!rows) return [];
-    const q = query.trim().toLowerCase();
-    return rows.filter((r) => {
-      if (onlyLow && r.stock > 5) return false;
-      if (q && ![r.productName, r.sku, r.size, r.color].join(" ").toLowerCase().includes(q)) return false;
-      return true;
-    });
-  }, [rows, query, onlyLow]);
-
-  async function setStock(row: InventoryRow, next: number) {
-    const stock = Math.max(0, Math.floor(next));
-    try {
-      const json = await adminSend("/api/admin/inventory", "PATCH", {
-        variantId: row.id,
-        stock,
-      });
-      if (json.mode === "demo") {
-        saveAdminProducts(
-          getAdminProducts().map((p: AdminProduct) =>
-            p.id === row.productId
-              ? {
-                  ...p,
-                  variants: p.variants.map((v) =>
-                    v.id === row.id ? { ...v, stock } : v,
-                  ),
-                }
-              : p,
-          ),
-        );
-      }
-      setRows((prev) =>
-        (prev ?? []).map((r) => (r.id === row.id ? { ...r, stock } : r)),
-      );
-      setMessage(`Stock for ${row.sku} set to ${stock}.`);
-    } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Could not update the stock.");
-    }
-  }
-
-  if (!rows) return <LoadingState label="Loading inventory…" />;
+export default async function AdminInventoryPage({ searchParams }: Props) {
+  await requireAdmin("/admin/inventory");
+  const sp = await searchParams;
+  const q = typeof sp.q === "string" ? sp.q.slice(0, 60) : undefined;
+  const level = sp.level === "low" || sp.level === "out" ? sp.level : undefined;
+  const [{ rows, threshold }, movements] = await Promise.all([listInventory({ q, level }), recentMovements(30)]);
+  const tab = (l?: string) =>
+    cn("rounded-xs px-3 py-2 text-sm font-medium", (l ?? "") === (level ?? "") ? "bg-ink text-surface" : "text-ink-soft hover:bg-sand");
+  const qs = (l?: string) => {
+    const p = new URLSearchParams();
+    if (q) p.set("q", q);
+    if (l) p.set("level", l);
+    const s = p.toString();
+    return `/admin/inventory${s ? `?${s}` : ""}`;
+  };
 
   return (
     <div>
-      <PageTitle
-        title="Inventory"
-        subtitle={`${rows.filter((r) => r.stock <= 5).length} low-stock variants (5 or fewer)`}
-      />
-
-      {message && (
-        <p className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-          {message}
-        </p>
-      )}
-
-      <div className="mb-4 flex flex-wrap gap-2">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search product, SKU, size or colour…"
-          className="w-full max-w-md rounded border bg-white px-3 py-2 text-sm"
-        />
-        <label className="flex items-center gap-2 rounded border bg-white px-3 py-2 text-sm">
-          <input type="checkbox" checked={onlyLow} onChange={(e) => setOnlyLow(e.target.checked)} />
-          Low stock only
-        </label>
+      <AdminPageHeader title="Inventory" description={`Stock per size and colour. Low stock = ${threshold} or fewer (change in Settings).`} />
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <nav aria-label="Stock level" className="flex gap-1">
+          <Link href={qs()} className={tab()} aria-current={!level ? "page" : undefined}>
+            All
+          </Link>
+          <Link href={qs("low")} className={tab("low")} aria-current={level === "low" ? "page" : undefined}>
+            Low stock
+          </Link>
+          <Link href={qs("out")} className={tab("out")} aria-current={level === "out" ? "page" : undefined}>
+            Sold out
+          </Link>
+        </nav>
+        <form method="get" role="search" aria-label="Search inventory" className="ml-auto flex gap-2">
+          {level ? <input type="hidden" name="level" value={level} /> : null}
+          <label htmlFor="inv-q" className="sr-only">
+            Search SKU or product
+          </label>
+          <input id="inv-q" name="q" defaultValue={q} placeholder="SKU or product" className={cn(inputClasses(false), "h-10 w-48")} />
+          <Button type="submit" size="sm" className="h-10">
+            Search
+          </Button>
+        </form>
       </div>
 
-      {filtered.length === 0 ? (
-        <EmptyState message="No variants match these filters." />
+      {rows.length === 0 ? (
+        <EmptyState icon="box" title={level ? "Nothing here" : "No variants"} description={level === "low" ? "No variant is low on stock." : undefined} />
       ) : (
-        <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-zinc-50 text-xs uppercase text-zinc-500">
-              <tr>
-                <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">Variant</th>
-                <th className="px-4 py-3">SKU</th>
-                <th className="px-4 py-3 text-right">Stock</th>
-                <th className="px-4 py-3">Adjust</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filtered.map((r) => (
-                <tr key={r.id} className="hover:bg-zinc-50">
-                  <td className="px-4 py-3 font-medium">{r.productName}</td>
-                  <td className="px-4 py-3">{r.size} / {r.color}</td>
-                  <td className="px-4 py-3 font-mono text-xs">{r.sku}</td>
-                  <td className="px-4 py-3 text-right">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        r.stock === 0
-                          ? "bg-red-100 text-red-800"
-                          : r.stock <= 5
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-emerald-100 text-emerald-800"
-                      }`}
-                    >
-                      {r.stock === 0 ? "Out of stock" : `${r.stock} left`}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <button type="button" onClick={() => void setStock(r, r.stock - 1)} className="rounded border px-2 py-1" aria-label="Decrease stock">−</button>
-                      <input
-                        value={r.stock}
-                        onChange={(e) => void setStock(r, Number(e.target.value) || 0)}
-                        type="number"
-                        min={0}
-                        className="w-16 rounded border px-2 py-1 text-center text-sm"
-                        aria-label="Set stock"
-                      />
-                      <button type="button" onClick={() => void setStock(r, r.stock + 1)} className="rounded border px-2 py-1" aria-label="Increase stock">+</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="divide-y divide-stone rounded-card border border-stone bg-surface" data-testid="inventory-list">
+          {rows.map((r) => (
+            <li key={r.variantId} className="flex flex-wrap items-center gap-x-6 gap-y-3 p-4" data-testid="inventory-row">
+              <div className="min-w-0 flex-1 basis-60">
+                <Link href={`/admin/products/${r.productId}`} className="font-medium underline-offset-4 hover:underline">
+                  {r.productName}
+                </Link>
+                <p className="text-sm text-ink-soft">
+                  {r.color} · Size {r.size} · <span className="font-mono text-xs">{r.sku}</span>
+                </p>
+                {!r.productActive ? <Badge>Archived product</Badge> : null}
+              </div>
+              <div className="w-24 text-right">
+                <p className={cn("text-2xl font-semibold tabular-nums", r.stock === 0 ? "text-sale" : r.stock <= threshold ? "text-warning" : "")} data-testid="stock-qty">
+                  {r.stock}
+                </p>
+                <p className="text-xs text-muted">{r.stock === 0 ? "Sold out" : r.stock <= threshold ? "Low stock" : "In stock"}</p>
+              </div>
+              <StockAdjuster variantId={r.variantId} sku={r.sku} />
+            </li>
+          ))}
+        </ul>
       )}
+
+      <section aria-labelledby="history" className="mt-10">
+        <h2 id="history" className="font-display text-2xl">
+          Recent stock changes
+        </h2>
+        <ul className="mt-4 divide-y divide-stone rounded-card border border-stone bg-surface text-sm" data-testid="stock-history">
+          {movements.map((m) => (
+            <li key={m.id} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-3">
+              <span className={cn("w-12 font-semibold tabular-nums", m.change > 0 ? "text-success" : "text-sale")}>
+                {m.change > 0 ? `+${m.change}` : m.change}
+              </span>
+              <span className="min-w-0 flex-1">
+                {m.productName} <span className="font-mono text-xs text-muted">{m.sku}</span>
+              </span>
+              <span className="text-ink-soft">
+                {REASON_LABEL[m.reason] ?? m.reason}
+                {m.note && m.reason === "adjustment" ? ` — ${m.note}` : ""}
+                {m.orderNumber ? (
+                  <>
+                    {" "}
+                    <Link href={`/admin/orders/${m.orderNumber}`} className="font-mono underline">
+                      {m.orderNumber}
+                    </Link>
+                  </>
+                ) : null}
+              </span>
+              <span className="text-xs text-muted">
+                {adminDate.format(new Date(m.createdAt))}
+                {m.actor ? ` · ${m.actor}` : ""}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

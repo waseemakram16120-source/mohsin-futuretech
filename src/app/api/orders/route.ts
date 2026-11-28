@@ -1,333 +1,125 @@
-/**
- * Orders API (Step 3).
- *
- * POST /api/orders — creates an order from a validated cart. Prices and
- * stock are ALWAYS re-checked server-side against the catalogue; the
- * client-sent totals are ignored. When Supabase is configured the order
- * is written to `orders` / `order_items` / `payments` via the service-role
- * client (trusted server code — RLS blocks guest inserts, so the anon
- * client cannot create guest orders). When Supabase is NOT configured,
- * the order is returned as mode "demo" and the browser saves it to
- * localStorage — clearly marked demo, never faked as a database write.
- *
- * GET /api/orders?number=MF-...&phone=... — order lookup for tracking
- * and the account order detail page. A logged-in owner may look an order
- * up by number alone; guests must also match the delivery phone.
- */
-import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { KNOWN_ORDER_ERRORS, orderErrorMessage } from "@/lib/checkout/errors";
+import { ORDER_COOKIE, ORDER_COOKIE_MAX_AGE, rememberOrder, signOrders, verifyOrders } from "@/lib/checkout/order-access";
+import { clientIp, createRateLimiter } from "@/lib/checkout/rate-limit";
+import { fieldErrors, placeOrderSchema } from "@/lib/checkout/schema";
+import { orderCookieKey } from "@/lib/checkout/server-keys";
+import { getStoreSettings } from "@/lib/catalog/queries";
+import { checkoutPaymentMethods } from "@/lib/payments/registry";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isSupabaseConfigured } from "@/lib/data/store";
-import {
-  getServerCatalogue,
-  validateCouponServer,
-} from "@/lib/server-catalog";
-import { isValidPakistaniPhone } from "@/lib/cart";
-import {
-  DELIVERY_CHARGES_FLAT,
-  FREE_DELIVERY_THRESHOLD,
-} from "@/lib/constants";
-import type { PaymentMethod } from "@/lib/types";
 
-function digitsOnly(phone: string): string {
-  const digits = phone.replace(/[^\d]/g, "");
-  // 92 3XXXXXXXXX -> 03XXXXXXXXX so both spellings match.
-  if (digits.length === 12 && digits.startsWith("92")) return `0${digits.slice(2)}`;
-  return digits;
+// 8 orders per 10 minutes per IP is plenty for a real shopper
+// (ORDER_RATE_LIMIT overrides it, e.g. for automated tests).
+const limiter = createRateLimiter({ limit: Number(process.env.ORDER_RATE_LIMIT) || 8, windowMs: 10 * 60 * 1000 });
+
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) return true; // same-origin fetches may omit it; JSON + CORS still apply
+  try {
+    return new URL(origin).host === new URL(request.url).host;
+  } catch {
+    return false;
+  }
 }
 
-function generateOrderNumber(): string {
-  const now = new Date();
-  const date = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(
-    now.getDate(),
-  ).padStart(2, "0")}`;
-  return `MF-${date}-${String(Math.floor(10000 + Math.random() * 90000))}`;
-}
-
-interface OrderItemInput {
-  variantId?: unknown;
-  quantity?: unknown;
-}
-
-interface OrderPayload {
-  items?: unknown;
-  customer?: {
-    name?: unknown;
-    phone?: unknown;
-    address?: unknown;
-    city?: unknown;
-    province?: unknown;
-    postalCode?: unknown;
-    notes?: unknown;
-  };
-  paymentMethod?: unknown;
-  couponCode?: unknown;
-}
-
-function badRequest(message: string) {
-  return NextResponse.json({ error: message }, { status: 400 });
-}
-
+/**
+ * POST /api/orders — validates the checkout (Zod), then calls the
+ * place_order() database function, which re-prices every line, locks and
+ * decrements stock, applies the coupon and records the payment, all in one
+ * transaction. Guests are allowed; a signed-in customer is linked by id.
+ */
 export async function POST(request: Request) {
-  let payload: OrderPayload;
+  if (!sameOrigin(request)) {
+    return Response.json({ error: "Invalid request origin." }, { status: 403 });
+  }
+  const limit = limiter.check(clientIp(request.headers));
+  if (!limit.ok) {
+    return Response.json(
+      { error: "Too many orders from this connection. Please wait a few minutes and try again." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+    );
+  }
+
+  let body: unknown;
   try {
-    payload = (await request.json()) as OrderPayload;
+    body = await request.json();
   } catch {
-    return badRequest("Invalid order data.");
+    return Response.json({ error: "Invalid order data." }, { status: 400 });
+  }
+  const parsed = placeOrderSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json(
+      { error: "Please correct the highlighted fields.", fieldErrors: fieldErrors(parsed.error) },
+      { status: 400 },
+    );
+  }
+  const { customer, items, paymentMethod, couponCode } = parsed.data;
+  if (!checkoutPaymentMethods(await getStoreSettings({ live: true })).includes(paymentMethod)) {
+    return Response.json(
+      { error: "This payment method is not available right now. Please choose another.", fieldErrors: { paymentMethod: "This payment method is not available right now." } },
+      { status: 409 },
+    );
   }
 
-  const paymentMethod = payload.paymentMethod as PaymentMethod | undefined;
-  if (!paymentMethod || !["cod", "easypaisa", "jazzcash", "nayapay"].includes(paymentMethod)) {
-    return badRequest("Please select a payment method.");
-  }
-
-  const customer = payload.customer ?? {};
-  const name = typeof customer.name === "string" ? customer.name.trim() : "";
-  const phone = typeof customer.phone === "string" ? customer.phone.trim() : "";
-  const address = typeof customer.address === "string" ? customer.address.trim() : "";
-  const city = typeof customer.city === "string" ? customer.city.trim() : "";
-  const province = typeof customer.province === "string" ? customer.province.trim() : "";
-  const postalCode = typeof customer.postalCode === "string" ? customer.postalCode.trim() : "";
-  const notes = typeof customer.notes === "string" ? customer.notes.trim() : "";
-
-  if (name.length < 3) return badRequest("Please enter your full name.");
-  if (!isValidPakistaniPhone(phone))
-    return badRequest("Please enter a valid Pakistani mobile number (e.g. 0300 1234567).");
-  if (address.length < 10)
-    return badRequest("Please enter your full delivery address.");
-  if (city.length < 2) return badRequest("Please enter your city.");
-
-  if (!Array.isArray(payload.items) || payload.items.length === 0) {
-    return badRequest("Your cart is empty.");
-  }
-
-  // Re-price every line from the server catalogue — never trust the client.
-  const catalogue = await getServerCatalogue();
-  const lines: Array<{
-    variantId: string;
-    productId: string;
-    productSlug: string;
-    productName: string;
-    image: string;
-    sku: string;
-    size: string;
-    color: string;
-    unitPrice: number;
-    quantity: number;
-    lineTotal: number;
-  }> = [];
-  for (const raw of payload.items as OrderItemInput[]) {
-    const variantId = typeof raw.variantId === "string" ? raw.variantId : "";
-    const quantity = typeof raw.quantity === "number" ? raw.quantity : 0;
-    const variant = catalogue.find((v) => v.variantId === variantId);
-    if (!variant) return badRequest("One of the items in your cart is no longer available.");
-    if (!Number.isInteger(quantity) || quantity < 1)
-      return badRequest("Invalid quantity in your cart.");
-    if (quantity > variant.stock) {
-      return badRequest(
-        `Only ${variant.stock} left in stock for ${variant.productName} (${variant.size} / ${variant.color}).`,
-      );
-    }
-    lines.push({
-      variantId: variant.variantId,
-      productId: variant.productId,
-      productSlug: variant.productSlug,
-      productName: variant.productName,
-      image: variant.image,
-      sku: variant.sku,
-      size: variant.size,
-      color: variant.color,
-      unitPrice: variant.price,
-      quantity,
-      lineTotal: variant.price * quantity,
-    });
-  }
-
-  const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
-  const couponCode =
-    typeof payload.couponCode === "string" && payload.couponCode.trim()
-      ? payload.couponCode.trim().toUpperCase()
-      : null;
-  const coupon = couponCode
-    ? await validateCouponServer(couponCode, subtotal)
-    : { valid: false, discount: 0, message: "" };
-  if (couponCode && !coupon.valid) return badRequest(coupon.message);
-  const discount = coupon.valid ? coupon.discount : 0;
-  const afterDiscount = subtotal - discount;
-  const delivery =
-    afterDiscount >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGES_FLAT;
-  const total = afterDiscount + delivery;
-
-  // Logged-in customer (if any) — the order is linked to their account.
   let userId: string | null = null;
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient();
-      const { data } = await supabase.auth.getUser();
-      userId = data.user?.id ?? null;
-    } catch {
-      userId = null;
-    }
-  }
-
-  if (!isSupabaseConfigured()) {
-    // Demo mode — no database write. The browser saves this order locally.
-    return NextResponse.json({
-      mode: "demo",
-      orderNumber: generateOrderNumber(),
-      subtotal,
-      deliveryCharges: delivery,
-      discountAmount: discount,
-      couponCode: coupon.valid ? couponCode : null,
-      totalAmount: total,
-      paymentMethod,
-      paymentStatus: paymentMethod === "cod" ? "due" : "pending_verification",
-      status: "pending",
-      items: lines.map((line) => ({
-        productId: line.productId,
-        variantId: line.variantId,
-        productName: line.productName,
-        variantLabel: `${line.size} / ${line.color}`,
-        sku: line.sku,
-        unitPrice: line.unitPrice,
-        quantity: line.quantity,
-        lineTotal: line.lineTotal,
-        image: line.image,
-      })),
-    });
-  }
-
-  // Live mode — write via the service-role client (guest orders allowed).
-  const admin = getSupabaseAdmin();
-  const orderNumber = generateOrderNumber();
-  const { data: order, error: orderError } = await admin
-    .from("orders")
-    .insert({
-      order_number: orderNumber,
-      user_id: userId,
-      delivery_name: name,
-      delivery_phone: phone,
-      delivery_address: address,
-      city,
-      province: province || null,
-      postal_code: postalCode || null,
-      subtotal,
-      delivery_charges: delivery,
-      discount_amount: discount,
-      coupon_code: coupon.valid ? couponCode : null,
-      total_amount: total,
-      payment_method: paymentMethod,
-      status: "pending",
-      notes: notes || null,
-    })
-    .select("id, order_number")
-    .single();
-
-  if (orderError || !order) {
-    return NextResponse.json(
-      { error: "Could not save your order. Please try again." },
-      { status: 500 },
-    );
-  }
-
-  const { error: itemsError } = await admin.from("order_items").insert(
-    lines.map((line) => ({
-      order_id: (order as { id: string }).id,
-      product_id: line.productId,
-      variant_id: line.variantId,
-      product_name: line.productName,
-      variant_label: `${line.size} / ${line.color}`,
-      sku: line.sku,
-      unit_price: line.unitPrice,
-      quantity: line.quantity,
-    })),
-  );
-  if (itemsError) {
-    return NextResponse.json(
-      { error: "Could not save your order items. Please contact the store." },
-      { status: 500 },
-    );
-  }
-
-  await admin.from("payments").insert({
-    order_id: (order as { id: string }).id,
-    payment_method: paymentMethod,
-    amount: total,
-    status: paymentMethod === "cod" ? "due" : "pending_verification",
-  });
-
-  return NextResponse.json({
-    mode: "live",
-    orderNumber: (order as { order_number: string }).order_number,
-    orderId: (order as { id: string }).id,
-    subtotal,
-    deliveryCharges: delivery,
-    discountAmount: discount,
-    couponCode: coupon.valid ? couponCode : null,
-    totalAmount: total,
-    paymentMethod,
-    paymentStatus: paymentMethod === "cod" ? "due" : "pending_verification",
-    status: "pending",
-  });
-}
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const number = (searchParams.get("number") ?? "").trim().toUpperCase();
-  const phone = (searchParams.get("phone") ?? "").trim();
-  if (!number) return badRequest("Order number is required.");
-
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json({ mode: "demo", found: false });
-  }
-
-  const admin = getSupabaseAdmin();
-  const { data: order, error } = await admin
-    .from("orders")
-    .select("*")
-    .eq("order_number", number)
-    .single();
-  if (error || !order) {
-    return NextResponse.json({ found: false }, { status: 404 });
-  }
-
-  const row = order as unknown as {
-    user_id: string | null;
-    delivery_phone: string;
-  };
-
-  // Authorisation: the owner (signed in) or the delivery phone must match.
-  let allowed = false;
   try {
-    const supabase = await createClient();
-    const { data } = await supabase.auth.getUser();
-    if (data.user && row.user_id && data.user.id === row.user_id) allowed = true;
+    const { data } = await (await createClient()).auth.getUser();
+    userId = data.user?.id ?? null;
   } catch {
-    // Not signed in — fall through to the phone check.
-  }
-  if (!allowed && phone) {
-    allowed = digitsOnly(phone) === digitsOnly(row.delivery_phone);
-  }
-  if (!allowed) {
-    return NextResponse.json(
-      { error: "Order not found for this phone number." },
-      { status: 404 },
-    );
+    userId = null; // signed out
   }
 
-  const orderId = (order as unknown as { id: string }).id;
-  const [{ data: items }, { data: payments }] = await Promise.all([
-    admin.from("order_items").select("*").eq("order_id", orderId),
-    admin.from("payments").select("*").eq("order_id", orderId),
-  ]);
-
-  return NextResponse.json({
-    mode: "live",
-    found: true,
-    order: {
-      ...(order as Record<string, unknown>),
-      items: items ?? [],
-      payments: payments ?? [],
+  const { data, error } = await createAdminClient().rpc("place_order", {
+    p_user_id: userId,
+    p_customer: {
+      name: customer.name,
+      phone: customer.phone,
+      email: customer.email || null,
+      address: customer.address,
+      city: customer.city,
+      province: customer.province || null,
+      postal_code: customer.postalCode || null,
+      notes: customer.notes || null,
     },
+    p_items: items.map((i) => ({ variant_id: i.variantId, quantity: i.quantity })),
+    p_payment_method: paymentMethod,
+    p_coupon_code: couponCode || null,
   });
+
+  if (error) {
+    const code = error.message;
+    if (KNOWN_ORDER_ERRORS.has(code)) {
+      let detail: unknown = null;
+      try {
+        detail = error.details ? JSON.parse(error.details) : null;
+      } catch {
+        detail = error.details;
+      }
+      return Response.json({ error: orderErrorMessage(code), code, detail }, { status: 409 });
+    }
+    console.error("[api/orders] place_order failed", error);
+    return Response.json({ error: orderErrorMessage("unknown") }, { status: 500 });
+  }
+
+  const order = data as { order_number: string; total_amount: number; payment_method: string; payment_status: string };
+  const jar = await cookies();
+  const key = orderCookieKey();
+  jar.set(ORDER_COOKIE, signOrders(key, rememberOrder(verifyOrders(key, jar.get(ORDER_COOKIE)?.value), order.order_number)), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production" && !request.url.startsWith("http://localhost"),
+    path: "/",
+    maxAge: ORDER_COOKIE_MAX_AGE,
+  });
+
+  return Response.json(
+    {
+      orderNumber: order.order_number,
+      totalAmount: Number(order.total_amount),
+      paymentMethod: order.payment_method,
+      paymentStatus: order.payment_status,
+    },
+    { status: 201 },
+  );
 }

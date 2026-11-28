@@ -1,99 +1,73 @@
-/**
- * /admin/customers — customer management (PDF §5): contacts, profiles
- * and order history. Live via API, demo derived from demo orders.
- */
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { adminGet } from "@/lib/admin-client";
-import { getDemoAdminCustomers } from "@/lib/admin-data";
-import type { AdminCustomer } from "@/lib/admin-types";
-import { formatPKR } from "@/lib/constants";
-import {
-  EmptyState,
-  LoadingState,
-  PageTitle,
-} from "@/components/admin-ui";
+import { AdminPageHeader, adminDate } from "@/components/admin/ui";
+import { inputClasses } from "@/components/forms/Field";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/States";
+import { requireAdmin } from "@/lib/admin/auth";
+import { listCustomers } from "@/lib/admin/catalog";
+import { formatPkPhone } from "@/lib/checkout/phone";
+import { formatPrice } from "@/lib/format";
+import { cn } from "@/lib/cn";
 
-export default function AdminCustomersPage() {
-  const [customers, setCustomers] = useState<AdminCustomer[] | null>(null);
-  const [query, setQuery] = useState("");
+export const metadata: Metadata = { title: "Customers" };
 
-  useEffect(() => {
-    adminGet("/api/admin/customers")
-      .then((json) => {
-        if (json.mode === "live" && Array.isArray(json.customers)) {
-          setCustomers(json.customers as AdminCustomer[]);
-        } else {
-          setCustomers(getDemoAdminCustomers());
-        }
-      })
-      .catch(() => setCustomers(getDemoAdminCustomers()));
-  }, []);
+type Props = { searchParams: Promise<{ q?: string; page?: string }> };
 
-  const filtered = useMemo(() => {
-    if (!customers) return [];
-    const q = query.trim().toLowerCase();
-    if (!q) return customers;
-    return customers.filter((c) =>
-      [c.fullName, c.email, c.phone ?? ""].join(" ").toLowerCase().includes(q),
-    );
-  }, [customers, query]);
-
-  if (!customers) return <LoadingState label="Loading customers…" />;
-
+export default async function AdminCustomersPage({ searchParams }: Props) {
+  await requireAdmin("/admin/customers");
+  const sp = await searchParams;
+  const q = typeof sp.q === "string" ? sp.q.trim().slice(0, 60) || undefined : undefined;
+  const page = Math.max(1, Math.min(1000, Number(sp.page) || 1));
+  const { rows, total, pageSize } = await listCustomers({ q, page });
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  const href = (p: number) => `/admin/customers?${new URLSearchParams({ ...(q ? { q } : {}), ...(p > 1 ? { page: String(p) } : {}) })}`;
   return (
     <div>
-      <PageTitle title="Customers" subtitle={`${filtered.length} of ${customers.length} customers`} />
-
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search by name, email or phone…"
-        className="mb-4 w-full max-w-md rounded border bg-white px-3 py-2 text-sm"
-      />
-
-      {filtered.length === 0 ? (
-        <EmptyState message="No customers yet. Customers appear here after their first order or sign-up." />
+      <AdminPageHeader title="Customers" description={`${total} registered customer${total === 1 ? "" : "s"}${q ? " match" : ""}. Guest orders are listed under Orders.`} />
+      <form method="get" role="search" aria-label="Search customers" className="mb-6 flex gap-2">
+        <label htmlFor="c-q" className="sr-only">
+          Name, email or phone
+        </label>
+        <input id="c-q" name="q" defaultValue={q} placeholder="Name, email or phone" className={cn(inputClasses(false), "max-w-sm")} />
+        <Button type="submit" className="h-12">
+          Search
+        </Button>
+      </form>
+      {rows.length === 0 ? (
+        <EmptyState icon="user" title={q ? "No customers match" : "No customers yet"} />
       ) : (
-        <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-zinc-50 text-xs uppercase text-zinc-500">
-              <tr>
-                <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Contact</th>
-                <th className="px-4 py-3 text-right">Orders</th>
-                <th className="px-4 py-3 text-right">Total spent</th>
-                <th className="px-4 py-3">Last order</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filtered.map((c) => (
-                <tr key={c.id} className="hover:bg-zinc-50">
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/customers/${c.id}`} className="font-medium text-sky-700">
-                      {c.fullName}
-                    </Link>
-                    {c.role === "admin" && (
-                      <span className="ml-2 rounded-full bg-[#0f2440] px-2 py-0.5 text-xs font-semibold text-white">Admin</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
+        <ul className="divide-y divide-stone rounded-card border border-stone bg-surface" data-testid="customer-list">
+          {rows.map((c) => (
+            <li key={c.id}>
+              <Link href={`/admin/customers/${c.id}`} className="flex flex-wrap items-center gap-x-6 gap-y-1 p-4 hover:bg-sand/40" data-testid="customer-row">
+                <div className="min-w-0 flex-1 basis-56">
+                  <p className="font-medium">{c.fullName || "—"}</p>
+                  <p className="text-sm text-ink-soft">
                     {c.email}
-                    <span className="block text-xs text-zinc-500">{c.phone ?? "—"}</span>
-                  </td>
-                  <td className="px-4 py-3 text-right">{c.orderCount}</td>
-                  <td className="px-4 py-3 text-right font-semibold">{formatPKR(c.totalSpent)}</td>
-                  <td className="px-4 py-3 text-xs text-zinc-500">
-                    {c.lastOrderAt ? new Date(c.lastOrderAt).toLocaleDateString("en-PK") : "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    {c.phone ? ` · ${formatPkPhone(c.phone)}` : ""}
+                  </p>
+                </div>
+                <div className="text-sm">
+                  <p>
+                    {c.ordersCount} order{c.ordersCount === 1 ? "" : "s"} · {formatPrice(c.totalSpent)}
+                  </p>
+                  <p className="text-xs text-muted">{c.lastOrderAt ? `Last order ${adminDate.format(new Date(c.lastOrderAt))}` : `Joined ${adminDate.format(new Date(c.createdAt))}`}</p>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
       )}
+      {pages > 1 ? (
+        <nav aria-label="Pagination" className="mt-6 flex items-center justify-between text-sm">
+          {page > 1 ? <Link href={href(page - 1)} className="underline">← Previous</Link> : <span />}
+          <span className="text-muted">
+            Page {page} of {pages}
+          </span>
+          {page < pages ? <Link href={href(page + 1)} className="underline">Next →</Link> : <span />}
+        </nav>
+      ) : null}
     </div>
   );
 }
