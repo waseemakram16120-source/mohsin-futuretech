@@ -13,7 +13,6 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     // Old AI-generated code kept only as a reference until Phase 9.
-    "legacy/**",
     "playwright-report/**",
     "test-results/**",
   ]),

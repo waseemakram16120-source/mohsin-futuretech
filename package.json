@@ -15,7 +15,8 @@
     "db:start": "bash scripts/db-local.sh start",
     "db:stop": "bash scripts/db-local.sh stop",
     "db:reset": "bash scripts/db-local.sh reset",
-    "db:env": "bash scripts/db-local.sh env"
+    "db:env": "bash scripts/db-local.sh env",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

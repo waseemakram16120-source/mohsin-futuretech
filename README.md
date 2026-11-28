@@ -6,8 +6,11 @@ Production e-commerce site for a Pakistani clothing store, built from
 **Stack:** Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 ·
 Supabase (Postgres, Auth, Storage) · Zod · Vitest · Playwright · Vercel.
 
-> Work is delivered in phases (see the project plan). The old AI-generated
-> code is kept in `legacy/` for reference only and will be deleted in Phase 9.
+> **Status:** all 10 phases complete — storefront, cart & checkout, manual
+> EasyPaisa/JazzCash payments, customer accounts, admin dashboard, reports,
+> final QA. Go-live steps: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+> Store staff: [docs/ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md).
+> QA results: [docs/QA-REPORT.md](docs/QA-REPORT.md).
 
 ## Project layout
 
@@ -30,7 +33,9 @@ public/placeholders/  original placeholder images used by the seed
 tests/unit/           Vitest unit tests
 tests/db/             Vitest database tests (RLS, orders, payments, stock)
 tests/e2e/            Playwright end-to-end tests (desktop + mobile)
-docs/                 proposal and reference screenshots
+src/config/policies.ts  shipping/returns/privacy/terms wording (draft until confirmed)
+scripts/preflight.mjs read-only production check (npm run preflight)
+docs/                 proposal, deployment & admin guides, QA report, payments
 ```
 
 ## Getting started
@@ -41,13 +46,15 @@ cp .env.example .env.local   # then fill in your Supabase dev project values
 npm run dev
 ```
 
+For a fully local setup (no Supabase account needed): `npm run db:start`,
+then copy the values from `npm run db:env` into `.env.local`
+(`API_URL` → `NEXT_PUBLIC_SUPABASE_URL`, `ANON_KEY`, `SERVICE_ROLE_KEY`).
+
 ### Database
 
-Apply every file in `supabase/migrations/` **in order**, then `supabase/seed.sql`
-(sample data — skip it for the client's production project):
-
-- Supabase CLI: `supabase link` then `supabase db push`, or
-- Dashboard → SQL Editor: paste and run each file in order.
+Apply every file in `supabase/migrations/` **in order**; `supabase/seed.sql`
+(sample catalogue) is for development/staging only. Production steps,
+Auth settings and email templates: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 Make yourself an admin after signing up (SQL Editor):
 
@@ -66,6 +73,7 @@ update public.profiles set role = 'admin' where email = 'you@example.com';
 | `npm run db:reset` | Re-applies every migration and the seed from scratch |
 | `npm run test:e2e` | Playwright on a production build against the local Supabase (desktop + mobile, incl. axe accessibility checks) |
 | `npm run lint` / `npm run typecheck` / `npm run build` | Quality gates |
+| `npm run preflight` | Read-only check of a production Supabase project + site (see DEPLOYMENT.md §7) |
 
 The local stack is the official Supabase CLI (`supabase/config.toml`), so tests
 run against the same Postgres 17 / PostgREST / Auth / Storage as hosted
@@ -74,10 +82,11 @@ real project.
 
 ## Payments
 
-COD, JazzCash and Easypaisa. The direct merchant gateway core (attempts,
-verification pipeline, idempotency, replay protection) is built and tested;
-the JazzCash/Easypaisa adapters stay disabled until the official merchant
-integration guides and credentials are provided. See [docs/PAYMENTS.md](docs/PAYMENTS.md).
+COD, EasyPaisa and JazzCash. Wallets run in the proposal's **manual** mode:
+the customer pays the store's account and uploads Transaction ID + receipt;
+an admin approves or rejects. A direct merchant-gateway core is also built
+and tested but stays off until official merchant docs and credentials exist.
+See [docs/PAYMENTS.md](docs/PAYMENTS.md).
 
 ## Security model (summary)
 

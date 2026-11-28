@@ -21,11 +21,24 @@ const inter = localFont({
 });
 
 const fraunces = localFont({
-  // Upright only: the design never uses italics, so the 45 KB italic file is not shipped.
   src: [{ path: "./fonts/fraunces-latin-wght.woff2", style: "normal" }],
   variable: "--font-fraunces",
   weight: "100 900",
   display: "swap",
+});
+
+/**
+ * The italic display face is used for a single accent word in the hero, so
+ * it is NOT preloaded: it downloads after the page has rendered (swap) and
+ * never delays the first paint on slow connections.
+ */
+const frauncesItalic = localFont({
+  src: "./fonts/fraunces-latin-wght-italic.woff2",
+  style: "italic",
+  weight: "100 900",
+  variable: "--font-fraunces-italic",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -61,7 +74,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const whatsappHref = whatsappLink(settings.whatsapp, `Hi ${settings.storeName}, I have a question.`);
 
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${frauncesItalic.variable}`}>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"

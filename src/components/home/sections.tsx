@@ -77,7 +77,7 @@ export function Hero({ freeDeliveryMin, images }: { freeDeliveryMin: number; ima
             id="hero-title"
             className="mt-4 font-display text-[2.5rem] leading-[1.05] font-medium tracking-tight text-balance sm:text-5xl lg:text-display"
           >
-            Dressed for the city. <em className="font-normal text-accent">Built</em> for the season.
+            Dressed for the city. <em className="font-[family-name:var(--font-fraunces-italic)] font-normal text-accent">Built</em> for the season.
           </h1>
           <p className="mt-5 max-w-md text-base leading-relaxed text-ink-soft sm:text-lg">
             Considered jackets, denim and shirts for men and women — delivered to your door anywhere in

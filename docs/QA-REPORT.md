@@ -43,9 +43,11 @@ browser (it is read after the page loads). It is fully usable; a future
 improvement would be to render a server-side summary of the bag.
 
 ### Fixed during this phase
-- **Unused font removed** — the italic display font (45 KB) was downloaded by
-  every visitor but never used. Mobile LCP improved from 4.7 s to 3.3 s on the
-  product page; home 92 → 93–97, collection 92 → up to 99.
+- **Fonts** — the italic display font (45 KB) was preloaded on every page
+  although only one hero word uses it. It now loads after the page renders
+  (not preloaded), so only two fonts compete with the first paint. Mobile LCP
+  on the product page improved from 4.7 s to 3.3 s; home 92 → 84–97 (run to run),
+  collection 92 → up to 99.
 - **Content-Security-Policy violation** — Zod probed for `eval`; all imports now
   go through `src/lib/z.ts` in jitless mode. Best practices 96 → 100.
 - **Screen readers heard every product name twice** (photo alt + heading) —
