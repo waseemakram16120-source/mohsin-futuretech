@@ -13,12 +13,12 @@ const LINKS = [
   { href: "/wishlist", label: "Wishlist" },
 ];
 
-export function AccountNav() {
+export function AccountNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Account">
       <ul className="flex flex-wrap gap-1 lg:flex-col">
-        {LINKS.map((l) => {
+        {[...LINKS, ...(isAdmin ? [{ href: "/admin", label: "Store admin" }] : [])].map((l) => {
           const active = l.href === "/account" ? pathname === "/account" : pathname.startsWith(l.href);
           return (
             <li key={l.href} className="shrink-0">
