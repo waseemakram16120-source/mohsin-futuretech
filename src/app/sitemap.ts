@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
-import { getPublicEnv } from "@/lib/env";
+import { siteUrl } from "@/lib/site-url";
 import { createPublicClient } from "@/lib/supabase/public";
 
 export const revalidate = 3600;
 
 /** Public pages only: catalogue and info pages (never account, checkout or admin). */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = getPublicEnv().NEXT_PUBLIC_SITE_URL.replace(/\/+$/, "");
+  const base = siteUrl();
   const fixed = ["/", "/shop", "/new-arrivals", "/sale", "/collections/men", "/collections/women", "/size-guide", "/shipping-returns", "/contact", "/track", "/privacy", "/terms"];
   const entries: MetadataRoute.Sitemap = fixed.map((path) => ({
     url: `${base}${path === "/" ? "" : path}`,

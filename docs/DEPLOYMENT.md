@@ -153,8 +153,11 @@ Dashboard → **Authentication**:
    uploads Transaction ID + receipt, admin approves). Never set
    `PAYMENTS_TEST_GATEWAY` on Vercel.
 
-   For **Preview** deployments, use a separate *staging* Supabase project —
-   never the production keys.
+   For **Preview** deployments (every pull request), set the same four
+   variables for the *Preview* environment pointing at a separate *staging*
+   Supabase project with the same migrations — never the production keys and
+   never the old project. Without them, Preview builds stop with
+   "Missing environment variables for the Vercel "preview" environment".
 3. **Production branch.** The new code is on branch
    `claude/compassionate-archimedes-ftdeig`. Merge it into `main` through a
    pull request (after review), so `main` deploys to production.
@@ -297,4 +300,6 @@ privately and delete old ones when no longer needed.
 | Uploaded photos don't show | `NEXT_PUBLIC_SUPABASE_URL` changed after the build → redeploy. |
 | Admin sees "Access denied" | Their profile role is not `admin` (step 5); sign out and in again after changing it. |
 | Pages show old prices/stock for a minute | Normal: catalogue pages cache for up to 60 s; admin changes refresh immediately; bag and checkout always re-check live prices and stock. |
+| Vercel build fails with "Missing environment variables…" | Add the four variables for that environment (Production or Preview) — §4. |
+| Vercel build fails while "prerendering page /" | The Supabase project in that environment's variables has no (or an old) database: run the migrations on it (§2) or point the variables at the right project. |
 | Site down / 500 errors | Vercel → Deployments → logs; roll back if a deploy caused it; check `/api/health` and the Supabase status page. |

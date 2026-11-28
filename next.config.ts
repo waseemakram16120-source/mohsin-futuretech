@@ -1,5 +1,20 @@
 import type { NextConfig } from "next";
 
+// On Vercel, stop at once with a clear message when an environment (Preview /
+// Production) has no Supabase settings, instead of failing later while
+// pre-rendering pages. See docs/DEPLOYMENT.md §4.
+if (process.env.VERCEL) {
+  const missing = ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY", "NEXT_PUBLIC_SITE_URL"].filter(
+    (name) => !process.env[name],
+  );
+  if (missing.length) {
+    throw new Error(
+      `Missing environment variables for the Vercel "${process.env.VERCEL_ENV ?? "unknown"}" environment: ${missing.join(", ")}. ` +
+        "Add them in Vercel → Settings → Environment Variables (Preview deployments should use a staging Supabase project), then redeploy.",
+    );
+  }
+}
+
 const supabaseImages = (() => {
   try {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return null;
