@@ -49,8 +49,12 @@ export default defineConfig({
     trace: "off",
   },
   projects: [
-    { name: "desktop", testIgnore: /(checkout|payments)\.spec/, use: desktop },
-    { name: "mobile", testIgnore: /(checkout|payments)\.spec/, use: mobile },
+    { name: "desktop", testIgnore: /(checkout|payments|admin-catalog)\.spec/, use: desktop },
+    { name: "mobile", testIgnore: /(checkout|payments|admin-catalog)\.spec/, use: mobile },
+    // Admin catalogue tests add products/categories, so they run after the
+    // storefront tests that count products.
+    { name: "admin-desktop", testMatch: /admin-catalog\.spec/, use: desktop, dependencies: ["desktop", "mobile"] },
+    { name: "admin-mobile", testMatch: /admin-catalog\.spec/, use: mobile, dependencies: ["admin-desktop"] },
     // Checkout tests change stock, coupons and orders, so the two device
     // runs go one after the other instead of in parallel.
     { name: "checkout-desktop", testMatch: /(checkout|payments)\.spec/, use: desktop },

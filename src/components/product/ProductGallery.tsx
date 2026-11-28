@@ -23,7 +23,8 @@ export function ProductGallery({ images, name }: { images: Array<{ url: string; 
   };
 
   return (
-    <div className="lg:grid lg:grid-cols-[4.5rem_1fr] lg:gap-4">
+    // The thumbnail column exists only for 2+ photos; one photo fills the width.
+    <div className={cn(images.length > 1 && "lg:grid lg:grid-cols-[4.5rem_1fr] lg:gap-4")}>
       {images.length > 1 ? (
         <ul className="hidden flex-col gap-3 lg:flex" aria-label="Product images">
           {images.map((image, i) => (
