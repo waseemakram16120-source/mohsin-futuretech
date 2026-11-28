@@ -1,6 +1,6 @@
 # Payments — COD, JazzCash, Easypaisa
 
-Implemented against `STRICT_JazzCash_Easypaisa_Payment_Integration.md` (on `main`).
+Gateway core implemented against [`payments/STRICT_JazzCash_Easypaisa_Payment_Integration.md`](payments/STRICT_JazzCash_Easypaisa_Payment_Integration.md).
 
 | Method | Status |
 |---|---|
